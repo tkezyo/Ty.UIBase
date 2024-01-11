@@ -3,21 +3,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using ReactiveUI;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Ty;
 using Ty.ViewModels;
 
 namespace Ty.Views
@@ -25,7 +13,7 @@ namespace Ty.Views
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : HandyControl.Controls.Window, IViewFor<MainWindowViewModel>
     {
         public MainWindow(IHostApplicationLifetime hostApplicationLifetime, IOptions<PageOptions> options)
         {
@@ -36,6 +24,10 @@ namespace Ty.Views
 
             RxApp.MainThreadScheduler.Schedule(async () =>
             {
+                if (options.Value.FirstLoadPage is null)
+                {
+                    return;
+                }
                 var login = TyApp.ServiceProvider.GetRequiredService(options.Value.FirstLoadPage);
                 if (login is ITyRoutableViewModel routableViewModel)
                 {
@@ -49,9 +41,45 @@ namespace Ty.Views
 
         private readonly IHostApplicationLifetime hostApplicationLifetime;
 
+
         protected override void OnClosed(EventArgs e)
         {
             hostApplicationLifetime.StopApplication();
         }
+
+        //
+        // 摘要:
+        //     The view model dependency property.
+        public static readonly DependencyProperty ViewModelProperty = DependencyProperty.Register("ViewModel", typeof(MainWindowViewModel), typeof(MainWindow), new PropertyMetadata(null));
+
+        //
+        // 摘要:
+        //     Gets the binding root view model.
+        public MainWindowViewModel? BindingRoot => ViewModel;
+
+        public MainWindowViewModel? ViewModel
+        {
+            get
+            {
+                return (MainWindowViewModel)GetValue(ViewModelProperty);
+            }
+            set
+            {
+                SetValue(ViewModelProperty, value);
+            }
+        }
+
+        object? IViewFor.ViewModel
+        {
+            get
+            {
+                return ViewModel;
+            }
+            set
+            {
+                ViewModel = (MainWindowViewModel?)value;
+            }
+        }
+
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using ReactiveUI;
 using System;
 using System.Reactive;
@@ -8,7 +7,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Ty;
 using Ty.Services;
 using Ty.ViewModels;
 
@@ -65,13 +63,13 @@ namespace Ty
         protected virtual async Task FileFolderAsync(IInteractionContext<string,
                                      string?> interaction)
         {
-            var dialog = new CommonOpenFileDialog();
-            dialog.IsFolderPicker = true;
+            var dialog = new OpenFolderDialog();
+            dialog.Multiselect = false;
             dialog.Title = interaction.Input;
-            CommonFileDialogResult result = dialog.ShowDialog();
-            if (result == CommonFileDialogResult.Ok)
+            var result = dialog.ShowDialog();
+            if (result == true)
             {
-                interaction.SetOutput(dialog.FileName);
+                interaction.SetOutput(dialog.FolderName);
                 return;
             }
             interaction.SetOutput(null);

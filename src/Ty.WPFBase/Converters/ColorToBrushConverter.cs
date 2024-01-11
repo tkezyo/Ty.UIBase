@@ -7,7 +7,7 @@ namespace Ty.Converters
 {
     public class ColorToBrushConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is System.Drawing.Color color)
             {
