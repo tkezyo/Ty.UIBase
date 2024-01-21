@@ -10,6 +10,6 @@ $solutions = (
 # List of projects
 $projects = (
     "src/Ty.UIBase",
-    "src/Ty.WPFBase"
-   
+    "src/Ty.WPFBase",
+    "src/Ty.AvaloniaBase"
 )

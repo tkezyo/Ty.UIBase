@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<Import Project="..\..\common.props" />
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>Ty</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.0.7" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.0.7" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.7" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.7" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.7" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.7" />
+		<PackageReference Include="Avalonia.Xaml.Interactions.DragAndDrop" Version="11.0.6" />
+		<PackageReference Include="MessageBox.Avalonia" Version="3.1.5.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+		<PackageReference Include="Semi.Avalonia" Version="11.0.1" />
+		<PackageReference Include="Semi.Avalonia.ColorPicker" Version="11.0.1" />
+		<PackageReference Include="Semi.Avalonia.DataGrid" Version="11.0.1.1" />
+		<PackageReference Include="ReactiveUI.Fody" Version="19.5.39" />
+		<PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Ty.UIBase\Ty.UIBase.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\ConformDialog.axaml.cs">
+	    <DependentUpon>ConformDialog.axaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+</Project>

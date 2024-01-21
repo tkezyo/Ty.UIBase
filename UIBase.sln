@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ty.UIBase", "src\Ty.UIBase\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ty.WPFBase", "src\Ty.WPFBase\Ty.WPFBase.csproj", "{1BB42077-1541-4C84-B531-4164E699A30A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ty.AvaloniaBase", "src\Ty.AvaloniaBase\Ty.AvaloniaBase.csproj", "{525E892B-E5FD-4F71-A5D1-77EAD6A13A55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{1BB42077-1541-4C84-B531-4164E699A30A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BB42077-1541-4C84-B531-4164E699A30A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BB42077-1541-4C84-B531-4164E699A30A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{525E892B-E5FD-4F71-A5D1-77EAD6A13A55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{525E892B-E5FD-4F71-A5D1-77EAD6A13A55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{525E892B-E5FD-4F71-A5D1-77EAD6A13A55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{525E892B-E5FD-4F71-A5D1-77EAD6A13A55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +36,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E97AF863-9E18-4D3B-8C21-5ECD6639EA90} = {25D4C66E-2173-478D-ABBE-0E9FC0E93B57}
 		{1BB42077-1541-4C84-B531-4164E699A30A} = {25D4C66E-2173-478D-ABBE-0E9FC0E93B57}
+		{525E892B-E5FD-4F71-A5D1-77EAD6A13A55} = {25D4C66E-2173-478D-ABBE-0E9FC0E93B57}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FEB44B6F-4720-4F06-A598-10C1D50EA1D9}
