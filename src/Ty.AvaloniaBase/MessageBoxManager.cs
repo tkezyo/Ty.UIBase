@@ -60,11 +60,11 @@ namespace Ty
             Window.RegisterHandler(DoShowWindowAsync);
             SaveFile.RegisterHandler(SaveFileAsync);
             OpenFiles.RegisterHandler(FileDialogAsync);
-            Conform.RegisterHandler(ComformDialogAsync);
+            Conform.RegisterHandler(ConformDialogAsync);
             Prompt.RegisterHandler(PromptDialogAsync);
             SelectFolder.RegisterHandler(FileFolderAsync);
         }
-        protected virtual async Task ComformDialogAsync(IInteractionContext<ConformInfo,
+        protected virtual async Task ConformDialogAsync(IInteractionContext<ConformInfo,
                                   bool> interaction)
         {
             var window = GetCurrentWindow(interaction.Input.OwnerTitle);
@@ -83,7 +83,7 @@ namespace Ty
         protected virtual async Task PromptDialogAsync(IInteractionContext<PromptInfo,
                                   PromptResult> interaction)
         {
-            var dialog = TyApp.ServiceProvider.GetRequiredService<IViewFor<PromptDialogViewModel>>();
+            var dialog = TyApp.ServiceProvider.GetRequiredKeyedService<IViewFor>(typeof(PromptDialogViewModel).FullName);
             var viewModel = TyApp.ServiceProvider.GetRequiredService<PromptDialogViewModel>();
 
             viewModel.Title = interaction.Input.Title;
@@ -116,7 +116,7 @@ namespace Ty
         protected virtual async Task DoShowDialogAsync(IInteractionContext<ModalInfo,
                                            bool> interaction)
         {
-            var dialog = TyApp.ServiceProvider.GetRequiredService<IViewFor<ModalDialogViewModel>>();
+            var dialog = TyApp.ServiceProvider.GetRequiredKeyedService<IViewFor>(typeof(ModalDialogViewModel).FullName);
             var viewModel = TyApp.ServiceProvider.GetRequiredService<ModalDialogViewModel>();
 
             viewModel.Title = interaction.Input.Title;
@@ -144,7 +144,7 @@ namespace Ty
         protected virtual async Task DoShowWindowAsync(IInteractionContext<ModalInfo,
                                        bool> interaction)
         {
-            var dialog = TyApp.ServiceProvider.GetRequiredService<IViewFor<ModalDialogViewModel>>();
+            var dialog = TyApp.ServiceProvider.GetRequiredKeyedService<IViewFor>(typeof(ModalDialogViewModel).FullName);
             var viewModel = TyApp.ServiceProvider.GetRequiredService<ModalDialogViewModel>();
 
             viewModel.Title = interaction.Input.Title;
