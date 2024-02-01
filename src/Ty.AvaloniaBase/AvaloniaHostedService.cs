@@ -4,15 +4,18 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ReactiveUI;
 
 namespace Ty
 {
     public class AvaloniaHostedService<TApplication, TMainWindow> : IHostedService
          where TApplication : Application, new()
-         where TMainWindow : Window, new()
+         where TMainWindow : Window
     {
         public AvaloniaHostedService(IServiceProvider serviceProvider, IHostApplicationLifetime hostApplicationLifetime)
         {
+            TyApp.ServiceProvider = serviceProvider;
+
             _classicDesktopStyleApplicationLifetime = new ClassicDesktopStyleApplicationLifetime
             {
                 ShutdownMode = ShutdownMode.OnExplicitShutdown

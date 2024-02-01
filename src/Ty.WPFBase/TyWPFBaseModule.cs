@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 using System.Threading.Tasks;
 using Ty.Services;
 using Ty.ViewModels;
@@ -10,6 +11,7 @@ namespace Ty
     {
         public override Task ConfigureServices(IServiceCollection serviceDescriptors)
         {
+            RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
             serviceDescriptors.AddSingleton<IMessageBoxManager, MessageBoxManager>();
 
             serviceDescriptors.AddSingletonView<LayoutViewModel, LayoutView>();

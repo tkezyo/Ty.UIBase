@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 using Ty.AvaloniaBase.Views;
 using Ty.Services;
 using Ty.ViewModels;
@@ -9,6 +10,7 @@ public class TyAvaloniaBaseModule : ModuleBase
 {
     public override Task ConfigureServices(IServiceCollection serviceDescriptors)
     {
+        RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
         serviceDescriptors.AddSingleton<IMessageBoxManager, MessageBoxManager>();
 
         serviceDescriptors.AddSingletonView<LayoutViewModel, LayoutView>();

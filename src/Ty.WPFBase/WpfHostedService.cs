@@ -13,8 +13,9 @@ namespace Ty
           where TApplication : Application
           where TMainWindow : Window
     {
-        public WpfHostedService(TApplication application, TMainWindow mainWindow, IHostApplicationLifetime hostApplicationLifetime)
+        public WpfHostedService(TApplication application, TMainWindow mainWindow, IHostApplicationLifetime hostApplicationLifetime, IServiceProvider serviceProvider)
         {
+            TyApp.ServiceProvider = serviceProvider;
             this.application = application;
             this.mainWindow = mainWindow;
             hostApplicationLifetime.ApplicationStopping.Register(application.Shutdown);
