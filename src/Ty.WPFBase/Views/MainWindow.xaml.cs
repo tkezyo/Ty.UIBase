@@ -32,7 +32,6 @@ namespace Ty.Views
                 if (login is ITyRoutableViewModel routableViewModel)
                 {
                     routableViewModel.SetScreen(vm);
-                    //var login = _abpApplication.ServiceProvider.GetRequiredService<SerialPortViewModel>();
                     await vm.Router.Navigate.Execute(routableViewModel);
                 }
 

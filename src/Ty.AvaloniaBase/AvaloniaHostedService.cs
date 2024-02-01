@@ -1,38 +1,51 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.ReactiveUI;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Ty
 {
     public class AvaloniaHostedService<TApplication, TMainWindow> : IHostedService
-          where TApplication : Application
-          where TMainWindow : Window
+         where TApplication : Application, new()
+         where TMainWindow : Window, new()
     {
-        public AvaloniaHostedService(TApplication application, TMainWindow mainWindow, IHostApplicationLifetime hostApplicationLifetime)
+        public AvaloniaHostedService(IServiceProvider serviceProvider, IHostApplicationLifetime hostApplicationLifetime)
         {
-            this.application = application;
-            this.mainWindow = mainWindow;
-            //hostApplicationLifetime.ApplicationStopping.Register(application.Shutdown);
+            _classicDesktopStyleApplicationLifetime = new ClassicDesktopStyleApplicationLifetime
+            {
+                ShutdownMode = ShutdownMode.OnExplicitShutdown
+            };
+            _classicDesktopStyleApplicationLifetime.Exit += (s, e) =>
+            {
+                hostApplicationLifetime.StopApplication();
+            };
+            hostApplicationLifetime.ApplicationStopping.Register(() =>
+            {
+                _classicDesktopStyleApplicationLifetime.Shutdown();
+            });
+            this._serviceProvider = serviceProvider;
         }
 
-        private readonly TApplication application;
-        private readonly TMainWindow mainWindow;
+        private readonly IServiceProvider _serviceProvider;
+        private ClassicDesktopStyleApplicationLifetime _classicDesktopStyleApplicationLifetime;
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            //application.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            application.Run(mainWindow);
+            var builder = BuildAvaloniaApp();
+            _ = builder.SetupWithLifetime(_classicDesktopStyleApplicationLifetime);
+            _classicDesktopStyleApplicationLifetime.MainWindow = _serviceProvider.GetRequiredService<TMainWindow>();
+            _classicDesktopStyleApplicationLifetime.Start([]);
 
             return Task.CompletedTask;
         }
-
+        public static AppBuilder BuildAvaloniaApp()
+          => AppBuilder.Configure<TApplication>()
+              .UsePlatformDetect()
+              .WithInterFont()
+              .LogToTrace()
+              .UseReactiveUI();
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
