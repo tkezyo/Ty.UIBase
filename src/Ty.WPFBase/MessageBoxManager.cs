@@ -63,9 +63,11 @@ namespace Ty
         protected virtual async Task FileFolderAsync(IInteractionContext<string,
                                      string?> interaction)
         {
-            var dialog = new OpenFolderDialog();
-            dialog.Multiselect = false;
-            dialog.Title = interaction.Input;
+            var dialog = new OpenFolderDialog
+            {
+                Multiselect = false,
+                Title = interaction.Input
+            };
             var result = dialog.ShowDialog();
             if (result == true)
             {
@@ -123,10 +125,12 @@ namespace Ty
         protected virtual void FileDialogAsync(IInteractionContext<OpenFilesInfo,
                                             string[]?> interaction)
         {
-            var dlg = new OpenFileDialog();
-            dlg.Multiselect = interaction.Input.Multiselect;
-            dlg.Filter = $"({interaction.Input.FilterName})|{interaction.Input.Filter}";
-            dlg.Title = interaction.Input.Title;
+            var dlg = new OpenFileDialog
+            {
+                Multiselect = interaction.Input.Multiselect,
+                Filter = $"({interaction.Input.FilterName})|{interaction.Input.Filter}",
+                Title = interaction.Input.Title
+            };
 
             dlg.ShowDialog();
             interaction.SetOutput(dlg.FileNames);
@@ -135,14 +139,17 @@ namespace Ty
         protected virtual void SaveFileAsync(IInteractionContext<SaveFilesInfo,
                                        string?> interaction)
         {
-            var dlg = new SaveFileDialog();
-            dlg.DefaultExt = interaction.Input.DefaultExtension;
-            dlg.Title = interaction.Input.Title;
-            dlg.Filter = interaction.Input.Filter;
-            dlg.FileName = interaction.Input.FileName;
+            var dlg = new SaveFileDialog
+            {
+                DefaultExt = interaction.Input.DefaultExtension,
+                Title = interaction.Input.Title,
+                Filter = interaction.Input.Filter,
+                FileName = interaction.Input.FileName
+            };
 
 
-            var files = dlg.ShowDialog();
+            dlg.ShowDialog();
+
             interaction.SetOutput(dlg.FileName);
             return;
         }
@@ -261,7 +268,7 @@ namespace Ty
             await Task.CompletedTask;
         }
 
-        private Window? FindWindow(string? title)
+        private static Window? FindWindow(string? title)
         {
             foreach (Window item in Application.Current.Windows)
             {
@@ -273,7 +280,7 @@ namespace Ty
             return null;
         }
 
-        private Window GetCurrentWindow(string? ownerTitle)
+        private static Window GetCurrentWindow(string? ownerTitle)
         {
             foreach (Window item in Application.Current.Windows)
             {
@@ -284,14 +291,13 @@ namespace Ty
             }
             return GetLastWindow(Application.Current.MainWindow);
         }
-        private Window GetLastWindow(Window window)
+        private static Window GetLastWindow(Window window)
         {
-            var first = window.OwnedWindows.Count > 0 ? window.OwnedWindows[0] : null;
-            if (first is null)
+            if (window.OwnedWindows.Count==0)
             {
                 return window;
             }
-            return GetLastWindow(first);
+            return GetLastWindow(window.OwnedWindows[0]);
         }
     }
 }

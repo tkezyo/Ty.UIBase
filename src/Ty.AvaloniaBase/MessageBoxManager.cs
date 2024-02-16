@@ -70,11 +70,11 @@ namespace Ty
             var window = GetCurrentWindow(interaction.Input.OwnerTitle);
 
 
-            var dialog = new ConformDialog();
-
-            dialog.Title = interaction.Input.Title;
-
-            dialog.DataContext = interaction.Input.Message;
+            var dialog = new ConformDialog
+            {
+                Title = interaction.Input.Title,
+                DataContext = interaction.Input.Message
+            };
 
 
             var r = await dialog.ShowDialog<bool>(window);
@@ -90,7 +90,7 @@ namespace Ty
             viewModel.DefaultValue = interaction.Input.DefaultValue;
             dialog.ViewModel = viewModel;
             IDisposable? disposable = null;
-            TaskCompletionSource<PromptResult> tcs = new TaskCompletionSource<PromptResult>();
+            TaskCompletionSource<PromptResult> tcs = new();
             if (dialog is Window window)
             {
                 window.DataContext = viewModel;
@@ -124,7 +124,7 @@ namespace Ty
             viewModel.Height = interaction.Input.Height;
             viewModel.ModalViewModel = interaction.Input.ViewModel;
             IDisposable? disposable = null;
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            TaskCompletionSource<bool> tcs = new();
 
             if (dialog is Window window)
             {
@@ -152,7 +152,7 @@ namespace Ty
             viewModel.Height = interaction.Input.Height;
             viewModel.ModalViewModel = interaction.Input.ViewModel;
             IDisposable? disposable = null;
-            TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+            TaskCompletionSource<bool> tcs = new();
 
             if (global::Avalonia.Application.Current!.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop &&
                 dialog is Window window)
@@ -208,19 +208,19 @@ namespace Ty
             {
                 filePickerFileType = new FilePickerFileType(interaction.Input.FilterName)
                 {
-                    Patterns = new[] { interaction.Input.Filter },
-                    MimeTypes = new[] { interaction.Input.Filter }
+                    Patterns = [interaction.Input.Filter],
+                    MimeTypes = [interaction.Input.Filter]
                 };
             }
 
             var result = await sp.OpenFilePickerAsync(new FilePickerOpenOptions()
             {
                 Title = interaction.Input.Title,
-                FileTypeFilter = new List<FilePickerFileType> { filePickerFileType },
+                FileTypeFilter = [filePickerFileType],
                 AllowMultiple = interaction.Input.Multiselect,
             });
 
-            interaction.SetOutput(result.Select(c => c.TryGetLocalPath()).ToArray());
+            interaction.SetOutput(result.Select(c => c.TryGetLocalPath() ?? string.Empty).ToArray());
             return;
 
 
@@ -247,13 +247,12 @@ namespace Ty
                 Title = interaction.Input,
                 AllowMultiple = false,
             });
-            var r = result.FirstOrDefault();
-            if (r is null)
+            if (result.Count == 0)
             {
                 interaction.SetOutput(null);
                 return;
             }
-            interaction.SetOutput(r.Path.LocalPath);
+            interaction.SetOutput(result[0].Path.LocalPath);
         }
         protected virtual async Task SaveFileAsync(IInteractionContext<SaveFilesInfo,
                                     string?> interaction)
@@ -267,8 +266,8 @@ namespace Ty
             {
                 filePickerFileType = new FilePickerFileType(interaction.Input.FilterName)
                 {
-                    Patterns = new[] { interaction.Input.Filter },
-                    MimeTypes = new[] { interaction.Input.Filter }
+                    Patterns = [interaction.Input.Filter],
+                    MimeTypes = [interaction.Input.Filter]
                 };
             }
 
@@ -277,10 +276,7 @@ namespace Ty
                 Title = interaction.Input.Title,
                 DefaultExtension = interaction.Input.DefaultExtension,
                 SuggestedFileName = interaction.Input.FileName,
-                FileTypeChoices = new List<FilePickerFileType>
-                            {
-                               filePickerFileType
-                            },
+                FileTypeChoices = [filePickerFileType],
             });
             //var dlg = new SaveFileDialog();
             //dlg.DefaultExtension = interaction.Input;
@@ -303,7 +299,7 @@ namespace Ty
             }
             return null;
         }
-        private Window GetCurrentWindow(string? ownerTitle)
+        private static Window GetCurrentWindow(string? ownerTitle)
         {
             if (Avalonia.Application.Current!.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -318,14 +314,13 @@ namespace Ty
             }
             return null!;
         }
-        private Window GetLastWindow(Window window)
+        private static Window GetLastWindow(Window window)
         {
-            var first = window.OwnedWindows.FirstOrDefault();
-            if (first is null)
+            if (window.OwnedWindows.Count == 0)
             {
                 return window;
             }
-            return GetLastWindow(first);
+            return GetLastWindow(window.OwnedWindows[0]);
         }
     }
 }
