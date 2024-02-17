@@ -58,9 +58,9 @@ public interface IModule
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile("appsettings.json", optional: true)
 #if !DEBUG
-            .AddJsonFile("appsettings.secrets.json", optional: false)
+            .AddJsonFile("appsettings.secrets.json", optional: true)
 #endif
             ;
         if (action is not null)
@@ -69,6 +69,7 @@ public interface IModule
         }
         return builder.Build();
     }
+
     public static async Task<IHost?> CreateHost<T>(string[] args, Func<IConfigurationBuilder, Task>? configBuild = null, Action<IServiceCollection>? action = null, bool skipVerification = true)
         where T : IModule, new()
     {
