@@ -10,7 +10,7 @@ public abstract class ModuleBase : IModule
     public string Name => GetType().Name;
     public Dictionary<string, IModule> Modules { get; set; } = [];
 
-    public abstract Task ConfigureServices(IServiceCollection serviceDescriptors);
+    public abstract Task ConfigureServices(IServiceCollection serviceDescriptors, IConfigurationRoot configurationRoot);
 
     public virtual void DependsOn()
     {
@@ -34,7 +34,7 @@ public abstract class ModuleBase : IModule
         t.DependsOn();
     }
 
-    public virtual async Task PreConfigureServices()
+    public virtual async Task PreConfigureServices(IConfigurationRoot configurationRoot)
     {
         await Task.CompletedTask;
     }
@@ -50,8 +50,8 @@ public interface IModule
     string Name { get; }
     Dictionary<string, IModule> Modules { get; set; }
     void DependsOn();
-    Task ConfigureServices(IServiceCollection serviceDescriptors);
-    Task PreConfigureServices();
+    Task ConfigureServices(IServiceCollection serviceDescriptors, IConfigurationRoot configurationRoot);
+    Task PreConfigureServices(IConfigurationRoot configurationRoot);
     Task PostConfigureServices(IServiceProvider serviceProvider);
 
     private static async Task<IConfigurationRoot> BuildConfiguration(Func<IConfigurationBuilder, Task>? action = null)
@@ -74,11 +74,11 @@ public interface IModule
         where T : IModule, new()
     {
         SkipVerification = skipVerification;
-        await BuildConfiguration(configBuild);
-        var modules = GetOrderedModules<T>();
+        var configurationRoot = await BuildConfiguration(configBuild);
+        var modules = GetOrderedModules<T>(skipVerification);
         foreach (var item in modules)
         {
-            await item.Module.PreConfigureServices();
+            await item.Module.PreConfigureServices(configurationRoot);
         }
         var host = Host.CreateDefaultBuilder(args)
             .ConfigureServices(async services =>
@@ -86,7 +86,7 @@ public interface IModule
                 action?.Invoke(services);
                 foreach (var item in modules)
                 {
-                    await item.Module.ConfigureServices(services);
+                    await item.Module.ConfigureServices(services, configurationRoot);
                 }
             })
             .Build();

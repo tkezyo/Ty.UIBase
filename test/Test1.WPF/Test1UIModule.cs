@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Test1.WPF
 {
     public class Test1UIModule : ModuleBase
     {
-        public override Task ConfigureServices(IServiceCollection serviceDescriptors)
+        public override Task ConfigureServices(IServiceCollection serviceDescriptors, IConfigurationRoot configurationRoot)
         {
             serviceDescriptors.AddSingleton<App>();
             serviceDescriptors.AddHostedService<WpfHostedService<App, MainWindow>>();
