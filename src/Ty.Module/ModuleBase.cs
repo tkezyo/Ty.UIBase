@@ -10,7 +10,7 @@ public abstract class ModuleBase : IModule
     public string Name => GetType().Name;
     public Dictionary<string, IModule> Modules { get; set; } = [];
 
-    public abstract Task ConfigureServices(IServiceCollection serviceDescriptors, IConfigurationRoot configurationRoot);
+    public abstract Task ConfigureServices(IHostApplicationBuilder builder);
 
     public virtual void DependsOn()
     {
@@ -34,7 +34,7 @@ public abstract class ModuleBase : IModule
         t.DependsOn();
     }
 
-    public virtual async Task PreConfigureServices(IConfigurationRoot configurationRoot)
+    public virtual async Task PreConfigureServices(IHostApplicationBuilder builder)
     {
         await Task.CompletedTask;
     }
@@ -50,52 +50,37 @@ public interface IModule
     string Name { get; }
     Dictionary<string, IModule> Modules { get; set; }
     void DependsOn();
-    Task ConfigureServices(IServiceCollection serviceDescriptors, IConfigurationRoot configurationRoot);
-    Task PreConfigureServices(IConfigurationRoot configurationRoot);
+    Task ConfigureServices(IHostApplicationBuilder hostApplicationBuilder);
+    Task PreConfigureServices(IHostApplicationBuilder  hostApplicationBuilder);
     Task PostConfigureServices(IServiceProvider serviceProvider);
 
-    private static async Task<IConfigurationRoot> BuildConfiguration(Func<IConfigurationBuilder, Task>? action = null)
-    {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true)
-#if !DEBUG
-            .AddJsonFile("appsettings.secrets.json", optional: true)
-#endif
-            ;
-        if (action is not null)
-        {
-            await action.Invoke(builder);
-        }
-        return builder.Build();
-    }
-
-    public static async Task<IHost?> CreateHost<T>(string[] args, Func<IConfigurationBuilder, Task>? configBuild = null, Action<IServiceCollection>? action = null, bool skipVerification = true)
+    public static async Task<IHost?> CreateApplicationHost<T>(string[] args, bool skipVerification = true)
         where T : IModule, new()
     {
         SkipVerification = skipVerification;
-        var configurationRoot = await BuildConfiguration(configBuild);
         var modules = GetOrderedModules<T>(skipVerification);
+
+        var hostBuilder = Host.CreateApplicationBuilder(args);
+
         foreach (var item in modules)
         {
-            await item.Module.PreConfigureServices(configurationRoot);
+            await item.Module.PreConfigureServices(hostBuilder);
         }
-        var host = Host.CreateDefaultBuilder(args)
-            .ConfigureServices(async services =>
-            {
-                action?.Invoke(services);
-                foreach (var item in modules)
-                {
-                    await item.Module.ConfigureServices(services, configurationRoot);
-                }
-            })
-            .Build();
+        foreach (var item in modules)
+        {
+            await item.Module.ConfigureServices(hostBuilder);
+        }
+
+        //build host
+        var host = hostBuilder.Build();
+
         foreach (var item in modules)
         {
             await item.Module.PostConfigureServices(host.Services);
         }
         return host;
     }
+  
     public static bool SkipVerification { get; set; } = true;
     public static List<IModule> AllModules { get; set; } = [];
     public static bool Verification(IModule newPre, IModule source)

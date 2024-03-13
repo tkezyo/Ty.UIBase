@@ -21,6 +21,14 @@ namespace Ty.Views
             var vm = new MainWindowViewModel() { Title = options.Value.Title ?? "" };
             DataContext = vm;
             this.hostApplicationLifetime = hostApplicationLifetime;
+            if (options.Value.Hight.HasValue)
+            {
+                Height = options.Value.Hight.Value;
+            }
+            if (options.Value.Width.HasValue)
+            {
+                Width = options.Value.Width.Value;
+            }
 
             RxApp.MainThreadScheduler.Schedule(async () =>
             {

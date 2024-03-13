@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using ReactiveUI;
 using Ty.AvaloniaBase.Views;
 using Ty.Services;
@@ -9,15 +10,15 @@ namespace Ty;
 
 public class TyAvaloniaBaseModule : ModuleBase
 {
-    public override Task ConfigureServices(IServiceCollection serviceDescriptors, IConfigurationRoot configurationRoot)
+    public override Task ConfigureServices(IHostApplicationBuilder builder)
     {
         RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
-        serviceDescriptors.AddSingleton<IMessageBoxManager, MessageBoxManager>();
+        builder.Services.AddSingleton<IMessageBoxManager, MessageBoxManager>();
 
-        serviceDescriptors.AddSingletonView<LayoutViewModel, LayoutView>();
-        serviceDescriptors.AddTransientView<ModalDialogViewModel, ModalDialog>();
-        serviceDescriptors.AddTransientView<PromptDialogViewModel, PromptDialog>();
-        serviceDescriptors.AddTransient<MainWindow>();
+        builder.Services.AddSingletonView<LayoutViewModel, LayoutView>();
+        builder.Services.AddTransientView<ModalDialogViewModel, ModalDialog>();
+        builder.Services.AddTransientView<PromptDialogViewModel, PromptDialog>();
+        builder.Services.AddTransient<MainWindow>();
 
         return Task.CompletedTask;
     }

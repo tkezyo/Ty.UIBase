@@ -20,7 +20,7 @@ namespace Test1.WPF
            .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
            .Enrich.FromLogContext();
 
-            var host = await IModule.CreateHost<Test1UIModule>(args, skipVerification: true) ?? throw new Exception();
+            var host = await IModule.CreateApplicationHost<Test1UIModule>(args, skipVerification: true) ?? throw new Exception();
 
             Thread thread = new(async () =>
             {

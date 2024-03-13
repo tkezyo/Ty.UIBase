@@ -11,4 +11,6 @@ public class PageOptions
     /// </summary>
     public Type? LayoutPage { get; set; }
     public string? Title { get; set; }
+    public int? Hight { get; set; }
+    public int? Width { get; set; }
 }

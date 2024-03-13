@@ -1,5 +1,3 @@
-using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +18,15 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         var vm = new MainWindowViewModel() { Title = options.Value.Title ?? "" };
         DataContext = vm;
         this.hostApplicationLifetime = hostApplicationLifetime;
+
+        if (options.Value.Hight.HasValue)
+        {
+            Height = options.Value.Hight.Value;
+        }
+        if (options.Value.Width.HasValue)
+        {
+            Width = options.Value.Width.Value;
+        }
 
         RxApp.MainThreadScheduler.Schedule(async () =>
         {
