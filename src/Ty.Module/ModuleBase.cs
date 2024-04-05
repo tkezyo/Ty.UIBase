@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
+using System.Reflection;
 
 namespace Ty;
 
@@ -10,7 +9,10 @@ public abstract class ModuleBase : IModule
     public string Name => GetType().Name;
     public Dictionary<string, IModule> Modules { get; set; } = [];
 
-    public abstract Task ConfigureServices(IHostApplicationBuilder builder);
+    public virtual Task ConfigureServices(IHostApplicationBuilder builder)
+    {
+        return Task.CompletedTask;
+    }
 
     public virtual void DependsOn()
     {
@@ -26,7 +28,7 @@ public abstract class ModuleBase : IModule
             IModule.AllModules.Add(t);
         }
 
-        Modules.Add(typeof(T).Name, t);
+        Modules.TryAdd(typeof(T).Name, t);
         if (!IModule.SkipVerification && !IModule.Verification(t, this))
         {
             throw new Exception($"模块 {t.Name} 依赖于 {this.Name}，但是 {this.Name} 已经依赖于 {t.Name}，这将导致循环依赖");
@@ -51,22 +53,49 @@ public interface IModule
     Dictionary<string, IModule> Modules { get; set; }
     void DependsOn();
     Task ConfigureServices(IHostApplicationBuilder hostApplicationBuilder);
-    Task PreConfigureServices(IHostApplicationBuilder  hostApplicationBuilder);
+    Task PreConfigureServices(IHostApplicationBuilder hostApplicationBuilder);
     Task PostConfigureServices(IServiceProvider serviceProvider);
 
-    public static async Task<IHost?> CreateApplicationHost<T>(string[] args, bool skipVerification = true)
+    public static async Task<IHost?> CreateApplicationHost<T>(string[] args, string? dependsOnFolder = null, bool skipVerification = true)
         where T : IModule, new()
     {
         SkipVerification = skipVerification;
-        var modules = GetOrderedModules<T>(skipVerification);
+        List<IModule> modules = [];
+        if (!string.IsNullOrEmpty(dependsOnFolder))
+        {
+            //读取 dlls文件夹下的所有 dll文件，然后加载
+            var files = Directory.GetFiles(dependsOnFolder, "*.dll");
+            foreach (var item in files)
+            {
+                FileInfo fileInfo = new(item);
+                var assembly = Assembly.LoadFile(fileInfo.FullName);
+                var types = assembly.GetTypes().Where(c => c.GetInterfaces().Contains(typeof(IModule)));
+                foreach (var type in types)
+                {
+                    var module = (IModule?)Activator.CreateInstance(type);
+                    if (module is not null)
+                    {
+                        module.DependsOn();
+                        modules.Add(module);
+                    }
+                }
+            }
+        }
+
+        var t = new T();
+        t.DependsOn();
+        modules.Add(t);
+
+        var orderedModules = GetOrderedModules<T>(modules, skipVerification);
+
 
         var hostBuilder = Host.CreateApplicationBuilder(args);
 
-        foreach (var item in modules)
+        foreach (var item in orderedModules)
         {
             await item.Module.PreConfigureServices(hostBuilder);
         }
-        foreach (var item in modules)
+        foreach (var item in orderedModules)
         {
             await item.Module.ConfigureServices(hostBuilder);
         }
@@ -74,13 +103,13 @@ public interface IModule
         //build host
         var host = hostBuilder.Build();
 
-        foreach (var item in modules)
+        foreach (var item in orderedModules)
         {
             await item.Module.PostConfigureServices(host.Services);
         }
         return host;
     }
-  
+
     public static bool SkipVerification { get; set; } = true;
     public static List<IModule> AllModules { get; set; } = [];
     public static bool Verification(IModule newPre, IModule source)
@@ -103,11 +132,11 @@ public interface IModule
 
         return true;
     }
-    public static List<ModuleModel> GetOrderedModules<T>(bool skipVerification = true)
+    public static List<ModuleModel> GetOrderedModules<T>(List<IModule> moduleList, bool skipVerification = true)
         where T : IModule, new()
     {
         SkipVerification = skipVerification;
-        List<ModuleModel> modules = [];
+        List<ModuleModel> results = [];
 
         void SetModules(IModule module)
         {
@@ -120,11 +149,14 @@ public interface IModule
                 moduleModel.PreModules.Add(attr.Key);
                 SetModules(attr.Value);
             }
-            modules.Add(moduleModel);
+            results.Add(moduleModel);
         }
-        var t = new T();
-        t.DependsOn();
-        SetModules(t);
+
+        foreach (var item in moduleList)
+        {
+            item.DependsOn();
+            SetModules(item);
+        }
 
         List<ModuleModel> Order(IEnumerable<ModuleModel> modules)
         {
@@ -153,8 +185,8 @@ public interface IModule
 
             return result;
         }
-        Order(modules);
-        return modules;
+        Order(results);
+        return results;
     }
 
 }
