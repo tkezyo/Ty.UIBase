@@ -11,6 +11,10 @@ namespace Ty
 {
     public class TyWPFBaseModule : ModuleBase
     {
+        public override void DependsOn()
+        {
+            AddDepend<TyUIBaseModule>();
+        }
         public override Task ConfigureServices(IHostApplicationBuilder builder)
         {
             RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();

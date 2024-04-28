@@ -6,6 +6,7 @@ public class PageOptions
     /// 登录页面
     /// </summary>
     public Type? FirstLoadPage { get; set; }
+    public object? Loading { get; set; }
     /// <summary>
     /// 布局页面
     /// </summary>

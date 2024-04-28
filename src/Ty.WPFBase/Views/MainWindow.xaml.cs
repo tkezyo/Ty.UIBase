@@ -6,6 +6,7 @@ using System;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using Ty.ViewModels;
 
 namespace Ty.Views
@@ -20,6 +21,20 @@ namespace Ty.Views
             InitializeComponent();
             var vm = new MainWindowViewModel() { Title = options.Value.Title ?? "" };
             DataContext = vm;
+
+            if (options.Value.Loading is not null)
+            {
+                host.DefaultContent = options.Value.Loading;
+            }
+            else
+            {
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = "Loading...";
+                textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+                textBlock.VerticalAlignment = VerticalAlignment.Center;
+                host.DefaultContent = textBlock;
+            }
+
             this.hostApplicationLifetime = hostApplicationLifetime;
             if (options.Value.Hight.HasValue)
             {

@@ -25,6 +25,8 @@ namespace Test1.WPF
         public override void DependsOn()
         {
             AddDepend<TyWPFBaseModule>();
+            AddDepend<TyUIBaseModule>();
+            AddDepend<TyWPFBaseModule>();
         }
     }
 }

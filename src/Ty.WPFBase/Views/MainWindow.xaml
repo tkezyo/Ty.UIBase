@@ -8,19 +8,15 @@
         xmlns:local="clr-namespace:Ty"
         xmlns:viewmodels="clr-namespace:Ty.ViewModels;assembly=Ty.UIBase"
         mc:Ignorable="d"
+           ShowIcon="True"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
         Title="{Binding Title}" Height="450" Width="800"
         WindowStartupLocation="CenterScreen">
- 
-        <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}">
-            <rxui:RoutedViewHost.DefaultContent>
-                <TextBlock Text="载入中。。"
-					   HorizontalAlignment="Center"
-					   VerticalAlignment="Center" />
-            </rxui:RoutedViewHost.DefaultContent>
-            <rxui:RoutedViewHost.ViewLocator>
-                <local:AppViewLocator />
-            </rxui:RoutedViewHost.ViewLocator>
-        </rxui:RoutedViewHost>
+
+    <rxui:RoutedViewHost Grid.Row="0" Router="{Binding Router}" x:Name="host">
+        <rxui:RoutedViewHost.ViewLocator>
+            <local:AppViewLocator />
+        </rxui:RoutedViewHost.ViewLocator>
+    </rxui:RoutedViewHost>
 
 </hc:Window>

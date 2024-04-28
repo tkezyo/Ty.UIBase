@@ -149,6 +149,10 @@ public interface IModule
                 moduleModel.PreModules.Add(attr.Key);
                 SetModules(attr.Value);
             }
+            if (results.Any(c => c.Module.Name == moduleModel.Module.Name))
+            {
+                return;
+            }
             results.Add(moduleModel);
         }
 
