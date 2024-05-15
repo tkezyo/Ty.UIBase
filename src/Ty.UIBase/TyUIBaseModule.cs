@@ -1,21 +1,18 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ReactiveUI;
-using System.Threading.Tasks;
 using Ty.Services;
-using Ty.ViewModels;
 
-namespace Ty
+namespace Ty;
+
+public class TyUIBaseModule : ModuleBase
 {
-    public class TyUIBaseModule : ModuleBase
+    public override Task ConfigureServices(IHostApplicationBuilder builder)
     {
-        public override Task ConfigureServices(IHostApplicationBuilder builder)
-        {
-            RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
-          
+        RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
 
-            return Task.CompletedTask;
-        }
+        builder.Services.AddSingleton<PermissionService>();
+
+        return Task.CompletedTask;
     }
 }

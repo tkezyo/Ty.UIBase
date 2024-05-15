@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Reactive;
 using System.Reactive.Linq;
-using Ty;
 
 namespace Ty.ViewModels
 {
@@ -19,11 +18,11 @@ namespace Ty.ViewModels
         {
             _kHToolOptions = options.Value;
             ShowThemeToggle = _kHToolOptions.ShowThemeToggle;
-            ToolCommand = ReactiveCommand.CreateFromTask<string>(ToolExcute);
+            ToolCommand = ReactiveCommand.CreateFromTask<MenuViewModel>(ToolExecute);
             UrlPathSegment = "Layout";
             foreach (var item in _kHToolOptions.Tools)
             {
-                var tool = new ToolViewModel(item.DisplayName, item.Name) { Show = true };
+                var tool = new MenuViewModel(item.DisplayName, item.Name) { Show = true };
                 if (item.Color.HasValue)
                 {
                     tool.Color = item.Color.Value;
@@ -79,12 +78,20 @@ namespace Ty.ViewModels
         /// 工具栏
         /// </summary>
         [Reactive]
-        public ObservableCollection<ToolViewModel> Tools { get; set; } = new ObservableCollection<ToolViewModel>();
-        public ReactiveCommand<string, Unit> ToolCommand { get; }
-        public virtual async Task ToolExcute(string nameValue)
+        public ObservableCollection<MenuViewModel> Tools { get; set; } = [];
+
+        [Reactive]
+        public ObservableCollection<MenuViewModel> Menus { get; set; } = [];
+        public ReactiveCommand<MenuViewModel, Unit> ToolCommand { get; }
+        public virtual async Task ToolExecute(MenuViewModel nameValue)
         {
             await Task.CompletedTask;
-            MessageBus.Current.SendMessage(nameValue, "Tool");
+            MessageBus.Current.SendMessage(nameValue, "Menu");
+            if (nameValue.ViewModel is not null)
+            {
+                var vm = Navigate(nameValue.ViewModel, this);
+                await Router.Navigate.Execute(vm);
+            }
         }
 
         /// <summary>
@@ -95,25 +102,19 @@ namespace Ty.ViewModels
 
     }
 
-    public class ToolViewModel : ReactiveObject
+    public class MenuViewModel(string displayName, string name) : ReactiveObject
     {
         /// <summary>
         /// 显示名称
         /// </summary>
         [Reactive]
-        public string DisplayName { get; set; }
-
-        public ToolViewModel(string displayName, string name)
-        {
-            DisplayName = displayName;
-            Name = name;
-        }
+        public string DisplayName { get; set; } = displayName;
 
         /// <summary>
         /// 名称
         /// </summary>
         [Reactive]
-        public string Name { get; set; }
+        public string Name { get; set; } = name;
         /// <summary>
         /// 图标
         /// </summary>
@@ -131,7 +132,9 @@ namespace Ty.ViewModels
         public bool Show { get; set; } = true;
         [Reactive]
         public Color Color { get; set; } = Color.Gray;
+
+        public Type? ViewModel { get; set; }
         [Reactive]
-        public ObservableCollection<ToolViewModel> Children { get; set; } = new();
+        public ObservableCollection<MenuViewModel> Children { get; set; } = [];
     }
 }

@@ -5,9 +5,10 @@ namespace Ty
     public class ToolOptions
     {
         public bool ShowThemeToggle { get; set; } = true;
-        public List<ToolInfo> Tools { get; set; } = [];
+        public List<MenuInfo> Tools { get; set; } = [];
+        public List<MenuInfo> Menus { get; set; } = [];
     }
-    public class ToolInfo(string displayName, string name, string? icon = null)
+    public class MenuInfo(string displayName, string name, string? icon = null)
     {
         public IObservable<bool>? Enable { get; set; }
         public IObservable<bool>? Show { get; set; }
@@ -19,6 +20,12 @@ namespace Ty
         public string DisplayName { get; set; } = displayName;
         public string? Icon { get; set; } = icon;
         public Color? Color { get; set; }
-        public List<ToolInfo> Children { get; set; } = [];
+        public List<MenuInfo> Children { get; set; } = [];
+
+        /// <summary>
+        /// 视图模型
+        /// </summary>
+        public  Type? ViewModel { get; set; }
     }
+ 
 }

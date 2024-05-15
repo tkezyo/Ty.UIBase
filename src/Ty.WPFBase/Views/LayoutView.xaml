@@ -34,10 +34,14 @@
         <!--logo-->
         <Image Visibility="{DynamicResource IsVisible}" Style="{StaticResource TyLogo}"></Image>
         <!--主菜单-->
-        <ItemsControl ItemsSource="{Binding Menus}" Style="{StaticResource TyMainMenuBox}">
+        <ItemsControl ItemsSource="{Binding Menus}" Style="{StaticResource TyMainMenuBox}" x:Name="menu">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button  Command="{Binding DataContext.NaviCommand,ElementName=page}" CommandParameter="{Binding .}" Style="{StaticResource TyMainMenuItem}">
+                    <Button  Command="{Binding DataContext.ToolCommand,ElementName=page}" CommandParameter="{Binding .}" Style="{StaticResource TyMainMenuItem}"
+                               Visibility="{Binding Show,Converter={StaticResource BooleanToVisibilityConverter}}"
+                               Foreground="{Binding Color,Converter={StaticResource colorToBrushConverter}}"
+                             IsEnabled="{Binding Enable}"
+                             >
                         <StackPanel Orientation="Vertical">
                             <TextBlock Text="{Binding Icon}" Style="{StaticResource SmallIconTBlockStyle}"/>
                             <TextBlock Text="{Binding DisplayName}" Style="{StaticResource TBlockStyle1}" />
@@ -47,12 +51,15 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
         <!--子菜单-->
-        <ItemsControl ItemsSource="{Binding	SubMenus}" Style="{StaticResource TySubMenuBox}">
+        <ItemsControl ItemsSource="{Binding	SelectedItem.Children,ElementName=menu}" Style="{StaticResource TySubMenuBox}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Button Content="{Binding DisplayName}"
-                                        Command="{Binding DataContext.NaviCommand,ElementName=page}" CommandParameter="{Binding	 .}"
-                                Style="{StaticResource TySubMenuItem}">
+                              Visibility="{Binding Show,Converter={StaticResource BooleanToVisibilityConverter}}"
+                              Foreground="{Binding Color,Converter={StaticResource colorToBrushConverter}}"
+                              IsEnabled="{Binding Enable}"
+                                        Command="{Binding DataContext.ToolCommand,ElementName=page}" CommandParameter="{Binding	 .}"
+                               >
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
