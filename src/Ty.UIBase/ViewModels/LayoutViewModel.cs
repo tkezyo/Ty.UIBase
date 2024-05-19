@@ -3,24 +3,58 @@ using Microsoft.Extensions.Options;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Reactive;
 using System.Reactive.Linq;
+using Ty.Services;
 
 namespace Ty.ViewModels
 {
     public class LayoutViewModel : ViewModelBase, IScreen
     {
-        protected readonly ToolOptions _kHToolOptions;
+        protected readonly MenuOptions _kHToolOptions;
+        private readonly MenuService _menuService;
 
         public RoutingState Router { get; } = new RoutingState(RxApp.MainThreadScheduler);
 
-        public LayoutViewModel(IOptions<ToolOptions> options)
+        //public IEnumerable<MenuViewModel> GetParent(MenuViewModel menu, IEnumerable<MenuViewModel> list)
+        //{
+        //    return list.FirstOrDefault(x => x.Name == menu.ParentName);
+        //}
+
+        public LayoutViewModel(IOptions<MenuOptions> options, MenuService menuService)
         {
             _kHToolOptions = options.Value;
             ShowThemeToggle = _kHToolOptions.ShowThemeToggle;
             MenuExecuteCommand = ReactiveCommand.CreateFromTask<MenuViewModel>(MenuExecute);
             UrlPathSegment = "Layout";
+            this._menuService = menuService;
+
+
+            menuService.Menus.Connect().Subscribe(c =>
+            {
+                foreach (var change in c)
+                {
+                    var parent = Menus.FirstOrDefault(x => x.Name == change.Current.Name);
+                  
+                    switch (change.Reason)
+                    {
+                        case ChangeReason.Add:
+                            // 处理添加事件
+                            break;
+                        case ChangeReason.Update:
+                            // 处理更新事件
+                            break;
+                        case ChangeReason.Remove:
+                            // 处理删除事件
+                            break;
+                        case ChangeReason.Refresh:
+                            // 处理刷新事件
+                            break;
+                            // 其他更改原因
+                    }
+                }
+            });
+
 
             Router.CurrentViewModel.WhereNotNull().Subscribe(c =>
             {
@@ -30,11 +64,7 @@ namespace Ty.ViewModels
                 }
             });
 
-            Menu.Connect().TransformToTree(x => x.ParentName ?? string.Empty)
-                .Transform(node => node.Item)
-                .Bind(out _menuViewModels)
-                .DisposeMany()
-                .Subscribe();
+
         }
 
         /// <summary>
@@ -61,15 +91,7 @@ namespace Ty.ViewModels
                 var vm = Navigate(nameValue.ViewModel, this);
                 await Router.Navigate.Execute(vm);
             }
-
-
         }
-
-        public SourceCache<MenuViewModel, string> Menu { get; set; }
-
-        private ReadOnlyObservableCollection<MenuViewModel> _menuViewModels;
-        public ReadOnlyObservableCollection<MenuViewModel> MenuViewModels => _menuViewModels;
-
 
         /// <summary>
         /// 当前页面名称
@@ -78,76 +100,5 @@ namespace Ty.ViewModels
         public string? CurrentPage { get; set; }
     }
 
-    public class MenuViewModel : ReactiveObject
-    {
-        public MenuViewModel(string name,
-            string? parentName,
-            IObservable<bool> changeEnable,
-            IObservable<bool> changeShow,
-            IObservable<Color?>? changeColor = null,
-            IObservable<string>? changeIcon = null,
-            IObservable<string>? changeDisplayName = null,
-             Type? viewModel = null
-            )
-        {
-            Name = name;
-            ViewModel = viewModel;
 
-            changeEnable.ToPropertyEx(this, x => x.Enable);
-            changeShow.ToPropertyEx(this, x => x.Show);
-            changeColor?.ToPropertyEx(this, x => x.Color);
-            changeIcon?.ToPropertyEx(this, x => x.Icon);
-            changeDisplayName?.ToPropertyEx(this, x => x.DisplayName);
-        }
-
-
-        /// <summary>
-        /// 名称
-        /// </summary>
-        [Reactive]
-        public string Name { get; set; }
-
-        [Reactive]
-        public string? ParentName { get; set; }
-
-        /// <summary>
-        /// 显示名称
-        /// </summary>
-        [ObservableAsProperty]
-        public string? DisplayName { get; }
-        /// <summary>
-        /// 图标
-        /// </summary>
-        [ObservableAsProperty]
-        public string? Icon { get; }
-        /// <summary>
-        /// 启用
-        /// </summary>
-        [ObservableAsProperty]
-        public bool Enable { get; }
-        /// <summary>
-        /// 显示
-        /// </summary>
-        [ObservableAsProperty]
-        public bool Show { get; }
-        [ObservableAsProperty]
-        public Color Color { get; } = Color.Gray;
-
-        public Type? ViewModel { get; set; }
-
-        public void AddChild(string name,
-            IObservable<bool> changeEnable,
-            IObservable<bool> changeShow,
-            IObservable<Color?>? changeColor = null,
-            IObservable<string>? changeIcon = null,
-            IObservable<string>? changeDisplayName = null,
-             Type? viewModel = null)
-        {
-            //Children.Add(new MenuViewModel(name, Name + name, changeEnable, changeShow, changeColor, changeIcon, changeDisplayName, viewModel));
-        }
-
-        public ReadOnlyObservableCollection<MenuViewModel> Children => _children;
-        private readonly ReadOnlyObservableCollection<MenuViewModel> _children;
-
-    }
 }
