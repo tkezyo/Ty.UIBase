@@ -22,7 +22,7 @@
 		<PackageReference Include="Avalonia.ReactiveUI" Version="11.0.10" />
 		<PackageReference Include="Avalonia.Xaml.Interactions.DragAndDrop" Version="11.0.10.9" />
 		<PackageReference Include="MessageBox.Avalonia" Version="3.1.5.1" />
-		<PackageReference Include="Semi.Avalonia" Version="11.0.7.2" />
+		<PackageReference Include="Semi.Avalonia" Version="11.0.7.3" />
 		<PackageReference Include="Semi.Avalonia.ColorPicker" Version="11.0.7.2" />
 		<PackageReference Include="Semi.Avalonia.DataGrid" Version="11.0.7.2" />
 		<PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
@@ -37,6 +37,13 @@
 	  <Compile Update="Views\ConformDialog.axaml.cs">
 	    <DependentUpon>ConformDialog.axaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Update="Fody" Version="6.8.1">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+	  </PackageReference>
 	</ItemGroup>
 
 </Project>

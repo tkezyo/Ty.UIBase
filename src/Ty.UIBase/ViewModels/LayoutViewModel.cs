@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using DynamicData;
+using Microsoft.Extensions.Options;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System.Collections.ObjectModel;
@@ -18,48 +19,9 @@ namespace Ty.ViewModels
         {
             _kHToolOptions = options.Value;
             ShowThemeToggle = _kHToolOptions.ShowThemeToggle;
-            ToolCommand = ReactiveCommand.CreateFromTask<MenuViewModel>(ToolExecute);
+            MenuExecuteCommand = ReactiveCommand.CreateFromTask<MenuViewModel>(MenuExecute);
             UrlPathSegment = "Layout";
-            foreach (var item in _kHToolOptions.Tools)
-            {
-                var tool = new MenuViewModel(item.DisplayName, item.Name) { Show = true };
-                if (item.Color.HasValue)
-                {
-                    tool.Color = item.Color.Value;
-                }
-                if (!string.IsNullOrEmpty(item.Icon))
-                {
-                    tool.Icon = item.Icon;
-                }
-                item.Enable?.Subscribe(c =>
-                {
-                    tool.Enable = c;
-                });
-                item.Show?.Subscribe(c =>
-                {
-                    tool.Show = c;
-                });
-                item.ChangeColor?.Subscribe(c =>
-                {
-                    if (c.HasValue)
-                    {
-                        tool.Color = c.Value;
-                    }
-                    else
-                    {
-                        tool.Color = Color.Gray;
-                    }
-                });
-                item.ChangeDisplayName?.Subscribe(c =>
-                {
-                    tool.DisplayName = c;
-                });
-                item.ChangeIcon?.Subscribe(c =>
-                {
-                    tool.Icon = c;
-                });
-                Tools.Add(tool);
-            }
+
             Router.CurrentViewModel.WhereNotNull().Subscribe(c =>
             {
                 if (!string.IsNullOrWhiteSpace(c.UrlPathSegment))
@@ -67,6 +29,12 @@ namespace Ty.ViewModels
                     CurrentPage = c.UrlPathSegment;
                 }
             });
+
+            Menu.Connect().TransformToTree(x => x.ParentName ?? string.Empty)
+                .Transform(node => node.Item)
+                .Bind(out _menuViewModels)
+                .DisposeMany()
+                .Subscribe();
         }
 
         /// <summary>
@@ -82,8 +50,9 @@ namespace Ty.ViewModels
 
         [Reactive]
         public ObservableCollection<MenuViewModel> Menus { get; set; } = [];
-        public ReactiveCommand<MenuViewModel, Unit> ToolCommand { get; }
-        public virtual async Task ToolExecute(MenuViewModel nameValue)
+
+        public ReactiveCommand<MenuViewModel, Unit> MenuExecuteCommand { get; }
+        public virtual async Task MenuExecute(MenuViewModel nameValue)
         {
             await Task.CompletedTask;
             MessageBus.Current.SendMessage(nameValue, "Menu");
@@ -92,49 +61,93 @@ namespace Ty.ViewModels
                 var vm = Navigate(nameValue.ViewModel, this);
                 await Router.Navigate.Execute(vm);
             }
+
+
         }
+
+        public SourceCache<MenuViewModel, string> Menu { get; set; }
+
+        private ReadOnlyObservableCollection<MenuViewModel> _menuViewModels;
+        public ReadOnlyObservableCollection<MenuViewModel> MenuViewModels => _menuViewModels;
+
 
         /// <summary>
         /// 当前页面名称
         /// </summary>
         [Reactive]
         public string? CurrentPage { get; set; }
-
     }
 
-    public class MenuViewModel(string displayName, string name) : ReactiveObject
+    public class MenuViewModel : ReactiveObject
     {
-        /// <summary>
-        /// 显示名称
-        /// </summary>
-        [Reactive]
-        public string DisplayName { get; set; } = displayName;
+        public MenuViewModel(string name,
+            string? parentName,
+            IObservable<bool> changeEnable,
+            IObservable<bool> changeShow,
+            IObservable<Color?>? changeColor = null,
+            IObservable<string>? changeIcon = null,
+            IObservable<string>? changeDisplayName = null,
+             Type? viewModel = null
+            )
+        {
+            Name = name;
+            ViewModel = viewModel;
+
+            changeEnable.ToPropertyEx(this, x => x.Enable);
+            changeShow.ToPropertyEx(this, x => x.Show);
+            changeColor?.ToPropertyEx(this, x => x.Color);
+            changeIcon?.ToPropertyEx(this, x => x.Icon);
+            changeDisplayName?.ToPropertyEx(this, x => x.DisplayName);
+        }
+
 
         /// <summary>
         /// 名称
         /// </summary>
         [Reactive]
-        public string Name { get; set; } = name;
+        public string Name { get; set; }
+
+        [Reactive]
+        public string? ParentName { get; set; }
+
+        /// <summary>
+        /// 显示名称
+        /// </summary>
+        [ObservableAsProperty]
+        public string? DisplayName { get; }
         /// <summary>
         /// 图标
         /// </summary>
-        [Reactive]
-        public string? Icon { get; set; }
+        [ObservableAsProperty]
+        public string? Icon { get; }
         /// <summary>
         /// 启用
         /// </summary>
-        [Reactive]
-        public bool Enable { get; set; } = true;
+        [ObservableAsProperty]
+        public bool Enable { get; }
         /// <summary>
         /// 显示
         /// </summary>
-        [Reactive]
-        public bool Show { get; set; } = true;
-        [Reactive]
-        public Color Color { get; set; } = Color.Gray;
+        [ObservableAsProperty]
+        public bool Show { get; }
+        [ObservableAsProperty]
+        public Color Color { get; } = Color.Gray;
 
         public Type? ViewModel { get; set; }
-        [Reactive]
-        public ObservableCollection<MenuViewModel> Children { get; set; } = [];
+
+        public void AddChild(string name,
+            IObservable<bool> changeEnable,
+            IObservable<bool> changeShow,
+            IObservable<Color?>? changeColor = null,
+            IObservable<string>? changeIcon = null,
+            IObservable<string>? changeDisplayName = null,
+             Type? viewModel = null)
+        {
+            //Children.Add(new MenuViewModel(name, Name + name, changeEnable, changeShow, changeColor, changeIcon, changeDisplayName, viewModel));
+        }
+
+        public ReadOnlyObservableCollection<MenuViewModel> Children => _children;
+        private readonly ReadOnlyObservableCollection<MenuViewModel> _children;
+
     }
 }
