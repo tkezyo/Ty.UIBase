@@ -10,14 +10,16 @@ namespace Test1.Avalonia.ViewModels
     public class TestViewModel : ViewModelBase
     {
         private readonly IMessageBoxManager _messageBoxManager;
+        private readonly MenuService _menuService;
 
-        public TestViewModel(IMessageBoxManager messageBoxManager)
+        public TestViewModel(IMessageBoxManager messageBoxManager, MenuService menuService)
         {
             this._messageBoxManager = messageBoxManager;
+            this._menuService = menuService;
             ShowMessageCommand = ReactiveCommand.CreateFromTask(ShowMessage);
         }
 
-        public ReactiveCommand<Unit, Unit> ShowMessageCommand { get;  }
+        public ReactiveCommand<Unit, Unit> ShowMessageCommand { get; }
 
         public async Task ShowMessage()
         {
@@ -25,7 +27,7 @@ namespace Test1.Avalonia.ViewModels
 
             if (r.Ok)
             {
-                await _messageBoxManager.Alert.Handle(new AlertInfo(r.Value));
+                _menuService.ChangeDisplayName("test1", r.Value);
             }
         }
     }

@@ -41,7 +41,7 @@ namespace Test1.Avalonia
                 {
                     DisplayName = "测试",
                     GroupName = "测试",
-                    Name = "测试",
+                    Name = "test1",
                     Icon = "Icon",
                     ViewModel = typeof(TestViewModel)
                 });

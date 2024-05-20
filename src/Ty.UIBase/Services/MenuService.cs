@@ -28,6 +28,7 @@ public class MenuService
         if (menu.HasValue)
         {
             menu.Value.Enable = enable;
+            Menus.AddOrUpdate(menu.Value);
         }
     }
 
@@ -37,6 +38,7 @@ public class MenuService
         if (menu.HasValue)
         {
             menu.Value.Show = show;
+            Menus.AddOrUpdate(menu.Value);
         }
     }
 
@@ -46,6 +48,7 @@ public class MenuService
         if (menu.HasValue)
         {
             menu.Value.Color = color;
+            Menus.AddOrUpdate(menu.Value);
         }
     }
 
@@ -55,6 +58,7 @@ public class MenuService
         if (menu.HasValue)
         {
             menu.Value.Icon = icon;
+            Menus.AddOrUpdate(menu.Value);
         }
     }
 
@@ -64,6 +68,7 @@ public class MenuService
         if (menu.HasValue)
         {
             menu.Value.DisplayName = displayName;
+            Menus.AddOrUpdate(menu.Value);
         }
     }
 
@@ -73,6 +78,7 @@ public class MenuService
         if (menu.HasValue)
         {
             menu.Value.ViewModel = viewModel;
+            Menus.AddOrUpdate(menu.Value);
         }
     }
 
@@ -121,7 +127,7 @@ public class MenuViewModel(MenuInfo menuInfo) : ReactiveObject
     [Reactive]
     public bool Show { get; set; } = menuInfo.Show;
     [Reactive]
-    public Color Color { get; set; } = menuInfo.Color ?? Color.DarkBlue;
+    public Color? Color { get; set; } = menuInfo.Color;
 
     /// <summary>
     /// 是否激活
