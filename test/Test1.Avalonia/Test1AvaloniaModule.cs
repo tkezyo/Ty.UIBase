@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Test1.Avalonia.ViewModels;
 using Ty;
 using Ty.AvaloniaBase.Views;
+using Ty.ViewModels;
 
 namespace Test1.Avalonia
 {
@@ -24,13 +25,30 @@ namespace Test1.Avalonia
             //serviceDescriptors.AddTransientCustomPageView<ChatViewModel, ChatView>();
             //serviceDescriptors.AddCustomLogView<CustomLogViewModel, CustomLogView>();
             hostApplicationBuilder.Services.AddSingletonView<TestViewModel, TestView>();
+            hostApplicationBuilder.Services.AddSingletonView<LayoutViewModel, LayoutView>();
 
 
             hostApplicationBuilder.Services.Configure<PageOptions>(options =>
             {
-                options.FirstLoadPage = typeof(TestViewModel);
+                options.FirstLoadPage = typeof(LayoutViewModel);
                 options.Title = "测试";
+
             });
+
+            hostApplicationBuilder.Services.Configure<MenuOptions>(options =>
+            {
+                options.Menus.Add(new MenuInfo
+                {
+                    DisplayName = "测试",
+                    GroupName = "测试",
+                    Name = "测试",
+                    Icon = "Icon",
+                    ViewModel = typeof(TestViewModel)
+                });
+
+            });
+
+
 
 
             return Task.CompletedTask;

@@ -35,10 +35,11 @@ namespace Ty.ViewModels
                 foreach (var change in c)
                 {
                     var parent = Menus.FirstOrDefault(x => x.Name == change.Current.Name);
-                  
+
                     switch (change.Reason)
                     {
                         case ChangeReason.Add:
+                            Menus.Add(new(change.Current));
                             // 处理添加事件
                             break;
                         case ChangeReason.Update:

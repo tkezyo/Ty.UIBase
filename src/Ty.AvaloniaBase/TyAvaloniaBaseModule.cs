@@ -10,6 +10,10 @@ namespace Ty;
 
 public class TyAvaloniaBaseModule : ModuleBase
 {
+    public override void DependsOn()
+    {
+        AddDepend<Ty.TyUIBaseModule>();
+    }
     public override Task ConfigureServices(IHostApplicationBuilder builder)
     {
         RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();

@@ -12,6 +12,7 @@ public class TyUIBaseModule : ModuleBase
         RxApp.DefaultExceptionHandler = new MyCoolObservableExceptionHandler();
 
         builder.Services.AddSingleton<PermissionService>();
+        builder.Services.AddSingleton<MenuService>();
 
         return Task.CompletedTask;
     }

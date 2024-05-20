@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Reactive.Linq;
 using DynamicData;
 using Microsoft.Extensions.Options;
+using System.Security.Principal;
 
 namespace Ty.Services;
 
@@ -91,54 +92,44 @@ public class MenuService
     }
 
 }
-public class MenuViewModel : ReactiveObject
+public class MenuViewModel(MenuInfo menuInfo) : ReactiveObject
 {
-    public MenuViewModel(string name,
-        IObservable<MenuInfo> changeEnable,
-         Type? viewModel = null
-        )
-    {
-        Name = name;
-        ViewModel = viewModel;
-
-        changeEnable.Select(c => c.Enable).ToPropertyEx(this, x => x.Enable);
-        changeEnable.Select(c => c.Show).ToPropertyEx(this, x => x.Show);
-        changeEnable.Select(c => c.Color)?.ToPropertyEx(this, x => x.Color);
-        changeEnable.Select(c => c.Icon)?.ToPropertyEx(this, x => x.Icon);
-        changeEnable.Select(c => c.DisplayName)?.ToPropertyEx(this, x => x.DisplayName);
-    }
-
-
     /// <summary>
     /// 名称
     /// </summary>
     [Reactive]
-    public string Name { get; set; }
+    public string Name { get; set; } = menuInfo.Name;
 
     /// <summary>
     /// 显示名称
     /// </summary>
-    [ObservableAsProperty]
-    public string? DisplayName { get; }
+    [Reactive]
+    public string? DisplayName { get; set; } = menuInfo.DisplayName;
     /// <summary>
     /// 图标
     /// </summary>
-    [ObservableAsProperty]
-    public string? Icon { get; }
+    [Reactive]
+    public string? Icon { get; set; } = menuInfo.Icon;
     /// <summary>
     /// 启用
     /// </summary>
-    [ObservableAsProperty]
-    public bool Enable { get; }
+    [Reactive]
+    public bool Enable { get; set; } = menuInfo.Enable;
     /// <summary>
     /// 显示
     /// </summary>
-    [ObservableAsProperty]
-    public bool Show { get; }
-    [ObservableAsProperty]
-    public Color Color { get; } = Color.Gray;
+    [Reactive]
+    public bool Show { get; set; } = menuInfo.Show;
+    [Reactive]
+    public Color Color { get; set; } = menuInfo.Color ?? Color.DarkBlue;
 
-    public Type? ViewModel { get; set; }
+    /// <summary>
+    /// 是否激活
+    /// </summary>
+    [Reactive]
+    public bool Active { get; set; }
+
+    public Type? ViewModel { get; set; } = menuInfo.ViewModel;
 
     public ObservableCollection<MenuViewModel> Children { get; set; } = [];
 
