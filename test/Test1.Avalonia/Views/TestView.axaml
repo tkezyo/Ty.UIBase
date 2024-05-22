@@ -7,6 +7,6 @@
 			 x:DataType="vm:TestViewModel"
              x:Class="Test1.Avalonia.TestView">
 	<Grid>
-		<Button Command="{Binding ShowMessageCommand}" Content="测试"/>
+		<Button Command="{Binding ShowMessageCommand}" Content="{Binding UrlPathSegment}"/>
 	</Grid>
 </UserControl>

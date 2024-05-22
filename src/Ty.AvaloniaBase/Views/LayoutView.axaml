@@ -8,11 +8,12 @@
 			 xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
 			 x:Name="page"
+			 xmlns:vms="clr-namespace:Ty.ViewModels;assembly=Ty.UIBase"
 			   xmlns:s="clr-namespace:System;assembly=mscorlib"
              x:Class="Ty.AvaloniaBase.Views.LayoutView">
 
 	<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,*">
-		<TextBlock Text="logo" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"></TextBlock>
+		<TextBlock Text="{Binding Title}" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"></TextBlock>
 		<Grid ColumnDefinitions="*,Auto"  Grid.Column="1" Grid.Row="0"  Margin="10">
 			<StackPanel  Grid.Column="1" HorizontalAlignment="Right"  Orientation="Horizontal">
 				<ToggleSwitch
@@ -35,17 +36,40 @@
 				</ToggleSwitch>
 			</StackPanel>
 		</Grid>
-		<StackPanel  Grid.Column="0" Grid.Row="1">
-			<ItemsControl ItemsSource="{Binding	Menus}">
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<ItemsControl ItemsSource="{Binding	Menus}" x:Name="menu">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel Orientation="Horizontal"></StackPanel>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Button Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}">
-						
+						<Button Classes="Primary" Classes.Active="{Binding Active}"  Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" HorizontalAlignment="Left" Margin="4,0">
+							<Button.Styles>
+								<Style Selector="Button.Active">
+									<Setter Property="Theme" Value="{DynamicResource SolidButton}" />
+								</Style>
+							</Button.Styles>
 						</Button>
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
-		</StackPanel>
+			<ItemsControl ItemsSource="{Binding SubMenus}" Margin="0,4">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Button Classes="Tertiary Small" Classes.Active="{Binding Active}" Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" HorizontalAlignment="Left"  Margin="4,0">
+							<Button.Styles>
+								<Style Selector="Button.Active">
+									<Setter Property="Theme" Value="{DynamicResource SolidButton}" />
+								</Style>
+							</Button.Styles>
+						</Button>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		
+	</StackPanel>
 		<rxui:RoutedViewHost Grid.Column="1" Grid.Row="1" Router="{Binding Router}"  PageTransition="{x:Null}">
 			<rxui:RoutedViewHost.DefaultContent>
 				<TextBlock Text="载入中。。"

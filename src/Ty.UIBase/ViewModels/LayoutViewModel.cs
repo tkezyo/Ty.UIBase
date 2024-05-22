@@ -25,7 +25,7 @@ namespace Ty.ViewModels
             }
             else
             {
-                var parent = list.FirstOrDefault(x => x.Name == levels[level]);
+                var parent = list.FirstOrDefault(x => x.Name == levels[level - 1]);
                 if (parent is not null)
                 {
                     return GetParent(levels, level + 1, parent.Children);
@@ -37,19 +37,28 @@ namespace Ty.ViewModels
             }
         }
 
-        public LayoutViewModel(IOptions<MenuOptions> options, MenuService menuService)
+        [Reactive]
+        public string Title { get; set; }
+
+        public LayoutViewModel(IOptions<MenuOptions> options, IOptions<PageOptions> options1, MenuService menuService)
         {
             _kHToolOptions = options.Value;
             ShowThemeToggle = _kHToolOptions.ShowThemeToggle;
             MenuExecuteCommand = ReactiveCommand.CreateFromTask<MenuViewModel>(MenuExecute);
             UrlPathSegment = "Layout";
             this._menuService = menuService;
+            Title = options1.Value.Title ?? "测试";
 
             _menuService.Menus.Connect().Subscribe(c =>
             {
                 foreach (var change in c)
                 {
-                    var parent = GetParent(change.Current.Name.Split('.'), 1, Menus);
+                    var levels = change.Current.Name.Split('.');
+                    var parent = GetParent(levels, 2, levels[0] switch
+                    {
+                        "Tools" => Tools,
+                        _ => Menus
+                    });
 
                     switch (change.Reason)
                     {
@@ -60,7 +69,7 @@ namespace Ty.ViewModels
                         case ChangeReason.Update:
                         case ChangeReason.Refresh:
                             {
-                                var p = parent.FirstOrDefault(v => v.Name == change.Current.Name);
+                                var p = parent.FirstOrDefault(v => v.FullName == change.Current.Name);
 
                                 if (p is not null)
                                 {
@@ -75,7 +84,7 @@ namespace Ty.ViewModels
                             break;
                         case ChangeReason.Remove:
                             {
-                                var p = parent.FirstOrDefault(v => v.Name == change.Current.Name);
+                                var p = parent.FirstOrDefault(v => v.FullName == change.Current.Name);
                                 if (p is not null)
                                 {
                                     parent.Remove(p);
@@ -88,6 +97,14 @@ namespace Ty.ViewModels
                     }
                 }
             });
+        }
+
+        public override async Task Activate()
+        {
+            if (Menus.Count > 0)
+            {
+                await MenuExecute(Menus.First());
+            }
         }
 
         /// <summary>
@@ -104,6 +121,9 @@ namespace Ty.ViewModels
         [Reactive]
         public ObservableCollection<MenuViewModel> Menus { get; set; } = [];
 
+        [Reactive]
+        public ObservableCollection<MenuViewModel> SubMenus { get; set; } = [];
+
         public ReactiveCommand<MenuViewModel, Unit> MenuExecuteCommand { get; }
         public virtual async Task MenuExecute(MenuViewModel menu)
         {
@@ -112,24 +132,79 @@ namespace Ty.ViewModels
             if (menu.ViewModel is not null)
             {
                 var vm = Navigate(menu.ViewModel, this);
+                vm.UrlPathSegment = menu.FullName;
                 await Router.Navigate.Execute(vm);
             }
 
-            var levels = menu.Name.Split('.');
+            var levels = menu.FullName.Split('.');
 
-            //取消所有选中
-            foreach (var item in Menus)
+            var parent = GetParent(levels, 2, levels[0] switch
             {
-                item.Active = false;
-            }
-
-            var parent = GetParent(levels, 1, Menus);
+                "Tools" => Tools,
+                _ => Menus
+            });
             var current = parent.FirstOrDefault(x => x.Name == menu.Name);
             if (current is not null)
             {
+                //取消所有选中
+                foreach (var item in parent)
+                {
+                    item.Active = false;
+                }
                 current.Active = true;
+                if (levels.Length == 2)
+                {
+                    SubMenus = current.Children;
+                }
             }
 
+
         }
+    }
+
+    public class MenuViewModel(MenuInfo menuInfo) : ReactiveObject
+    {
+        /// <summary>
+        /// 名称
+        /// </summary>
+        [Reactive]
+        public string Name { get; set; } = menuInfo.Name.Split('.')[^1];
+
+        [Reactive]
+        public string FullName { get; set; } = menuInfo.Name;
+
+        /// <summary>
+        /// 显示名称
+        /// </summary>
+        [Reactive]
+        public string? DisplayName { get; set; } = menuInfo.DisplayName;
+        /// <summary>
+        /// 图标
+        /// </summary>
+        [Reactive]
+        public string? Icon { get; set; } = menuInfo.Icon;
+        /// <summary>
+        /// 启用
+        /// </summary>
+        [Reactive]
+        public bool Enable { get; set; } = menuInfo.Enable;
+        /// <summary>
+        /// 显示
+        /// </summary>
+        [Reactive]
+        public bool Show { get; set; } = menuInfo.Show;
+        [Reactive]
+        public Color? Color { get; set; } = menuInfo.Color;
+
+        /// <summary>
+        /// 是否激活
+        /// </summary>
+        [Reactive]
+        public bool Active { get; set; }
+
+        public Type? ViewModel { get; set; } = menuInfo.ViewModel;
+
+        public ObservableCollection<MenuViewModel> Children { get; set; } = [];
+
     }
 }

@@ -41,11 +41,26 @@ namespace Test1.Avalonia
                 {
                     DisplayName = "测试",
                     GroupName = "测试",
-                    Name = "test1",
+                    Name = "Menu.test1",
                     Icon = "Icon",
                     ViewModel = typeof(TestViewModel)
                 });
-
+                options.Menus.Add(new MenuInfo
+                {
+                    DisplayName = "测试11",
+                    GroupName = "测试11",
+                    Name = "Menu.test1.test2",
+                    Icon = "Icon",
+                    ViewModel = typeof(TestViewModel),
+                });
+                options.Menus.Add(new MenuInfo
+                {
+                    DisplayName = "测试2",
+                    GroupName = "测试2",
+                    Name = "Menu.test2",
+                    Icon = "Icon",
+                    ViewModel = typeof(TestViewModel)
+                });
             });
 
 

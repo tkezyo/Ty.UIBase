@@ -27,7 +27,7 @@ namespace Test1.Avalonia.ViewModels
 
             if (r.Ok)
             {
-                _menuService.ChangeDisplayName("test1", r.Value);
+                _menuService.ChangeDisplayName(UrlPathSegment, r.Value);
             }
         }
     }
