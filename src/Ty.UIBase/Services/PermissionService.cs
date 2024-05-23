@@ -23,9 +23,12 @@ namespace Ty.Services
         /// </summary>
         /// <param name="permission"></param>
         /// <returns></returns>
-        public IObservable<bool> HasPermission(string permission)
+        public IObservable<bool> HasPermission(params string[] permissions)
         {
-            return Permissions.Watch(permission).Select(c => c.Reason != ChangeReason.Remove);
+            var observables = permissions.Select(permission => Permissions.Watch(permission).Select(c => c.Reason != ChangeReason.Remove));
+
+            return observables.CombineLatest().Select(values => values.All(value => value));
+
         }
     }
 }

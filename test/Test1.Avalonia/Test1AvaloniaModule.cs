@@ -43,7 +43,8 @@ namespace Test1.Avalonia
                     GroupName = "测试",
                     Name = "Menu.test1",
                     Icon = "Icon",
-                    ViewModel = typeof(TestViewModel)
+                    ViewModel = typeof(TestViewModel),
+                    Permissions = ["11"]
                 });
                 options.Menus.Add(new MenuInfo
                 {

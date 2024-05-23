@@ -11,11 +11,13 @@ namespace Test1.Avalonia.ViewModels
     {
         private readonly IMessageBoxManager _messageBoxManager;
         private readonly MenuService _menuService;
+        private readonly PermissionService _permissionService;
 
-        public TestViewModel(IMessageBoxManager messageBoxManager, MenuService menuService)
+        public TestViewModel(IMessageBoxManager messageBoxManager, MenuService menuService, PermissionService permissionService)
         {
             this._messageBoxManager = messageBoxManager;
             this._menuService = menuService;
+            this._permissionService = permissionService;
             ShowMessageCommand = ReactiveCommand.CreateFromTask(ShowMessage);
         }
 
@@ -28,6 +30,7 @@ namespace Test1.Avalonia.ViewModels
             if (r.Ok)
             {
                 _menuService.ChangeDisplayName(UrlPathSegment, r.Value);
+                _permissionService.AddPermission("11");
             }
         }
     }

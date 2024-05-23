@@ -14,6 +14,7 @@ namespace Ty.ViewModels
     {
         protected readonly MenuOptions _kHToolOptions;
         private readonly MenuService _menuService;
+        private readonly PermissionService _permissionService;
 
         public RoutingState Router { get; } = new RoutingState(RxApp.MainThreadScheduler);
 
@@ -40,13 +41,14 @@ namespace Ty.ViewModels
         [Reactive]
         public string Title { get; set; }
 
-        public LayoutViewModel(IOptions<MenuOptions> options, IOptions<PageOptions> options1, MenuService menuService)
+        public LayoutViewModel(IOptions<MenuOptions> options, IOptions<PageOptions> options1, MenuService menuService, PermissionService permissionService)
         {
             _kHToolOptions = options.Value;
             ShowThemeToggle = _kHToolOptions.ShowThemeToggle;
             MenuExecuteCommand = ReactiveCommand.CreateFromTask<MenuViewModel>(MenuExecute);
             UrlPathSegment = "Layout";
             this._menuService = menuService;
+            this._permissionService = permissionService;
             Title = options1.Value.Title ?? "测试";
 
             _menuService.Menus.Connect().Subscribe(c =>
@@ -63,7 +65,7 @@ namespace Ty.ViewModels
                     switch (change.Reason)
                     {
                         case ChangeReason.Add:
-                            parent.Add(new(change.Current));
+                            parent.Add(new(change.Current, _permissionService));
                             // 处理添加事件
                             break;
                         case ChangeReason.Update:
@@ -103,7 +105,7 @@ namespace Ty.ViewModels
         {
             if (Menus.Count > 0)
             {
-                await MenuExecute(Menus.First());
+                await MenuExecute(Menus.First(c => c.IsVisible));
             }
         }
 
@@ -162,39 +164,65 @@ namespace Ty.ViewModels
         }
     }
 
-    public class MenuViewModel(MenuInfo menuInfo) : ReactiveObject
+    public class MenuViewModel : ReactiveObject
     {
+        private readonly ObservableAsPropertyHelper<bool> _isVisible;
+        public bool IsVisible => _isVisible.Value;
+
+
+        public MenuViewModel(MenuInfo menuInfo, PermissionService permissionService)
+        {
+            Name = menuInfo.Name.Split('.')[^1];
+            FullName = menuInfo.Name;
+            DisplayName = menuInfo.DisplayName;
+            Icon = menuInfo.Icon;
+            Enable = menuInfo.Enable;
+            Show = menuInfo.Show;
+            Color = menuInfo.Color;
+            ViewModel = menuInfo.ViewModel;
+
+            var hasPermission = (menuInfo.Permissions is null || menuInfo.Permissions.Length == 0)
+                    ? Observable.Return(true)
+                    : permissionService.HasPermission(menuInfo.Permissions!);
+            var show = this.WhenAnyValue(x => x.Show);
+
+            _isVisible = hasPermission.CombineLatest(show, (permission, show) => permission && show)
+                .ToProperty(this, x => x.IsVisible);
+        }
+
+
+
         /// <summary>
         /// 名称
         /// </summary>
         [Reactive]
-        public string Name { get; set; } = menuInfo.Name.Split('.')[^1];
+        public string Name { get; set; }
 
         [Reactive]
-        public string FullName { get; set; } = menuInfo.Name;
+        public string FullName { get; set; }
 
         /// <summary>
         /// 显示名称
         /// </summary>
         [Reactive]
-        public string? DisplayName { get; set; } = menuInfo.DisplayName;
+        public string? DisplayName { get; set; }
         /// <summary>
         /// 图标
         /// </summary>
         [Reactive]
-        public string? Icon { get; set; } = menuInfo.Icon;
+        public string? Icon { get; set; }
         /// <summary>
         /// 启用
         /// </summary>
         [Reactive]
-        public bool Enable { get; set; } = menuInfo.Enable;
+        public bool Enable { get; set; }
         /// <summary>
         /// 显示
         /// </summary>
         [Reactive]
-        public bool Show { get; set; } = menuInfo.Show;
+        public bool Show { get; set; }
         [Reactive]
-        public Color? Color { get; set; } = menuInfo.Color;
+        public Color? Color { get; set; }
 
         /// <summary>
         /// 是否激活
@@ -202,7 +230,7 @@ namespace Ty.ViewModels
         [Reactive]
         public bool Active { get; set; }
 
-        public Type? ViewModel { get; set; } = menuInfo.ViewModel;
+        public Type? ViewModel { get; set; }
 
         public ObservableCollection<MenuViewModel> Children { get; set; } = [];
 

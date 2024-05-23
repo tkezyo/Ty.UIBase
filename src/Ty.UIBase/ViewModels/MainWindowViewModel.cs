@@ -1,10 +1,9 @@
 ﻿using ReactiveUI;
 
-namespace Ty.ViewModels
+namespace Ty.ViewModels;
+
+public class MainWindowViewModel : ReactiveObject, IScreen
 {
-    public class MainWindowViewModel : ReactiveObject, IScreen
-    {
-        public string Title { get; set; } = "Ty";
-        public RoutingState Router { get; } = new RoutingState();
-    }
+    public string Title { get; set; } = "Ty";
+    public RoutingState Router { get; } = new RoutingState();
 }

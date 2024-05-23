@@ -45,7 +45,8 @@
 				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Button Classes="Primary" Classes.Active="{Binding Active}"  Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" HorizontalAlignment="Left" Margin="4,0">
+						<Button Classes="Primary" Classes.Active="{Binding Active}"  Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" HorizontalAlignment="Left" Margin="4,0" IsVisible="{Binding IsVisible}"
+								IsEnabled="{Binding Enable}">
 							<Button.Styles>
 								<Style Selector="Button.Active">
 									<Setter Property="Theme" Value="{DynamicResource SolidButton}" />
@@ -58,7 +59,7 @@
 			<ItemsControl ItemsSource="{Binding SubMenus}" Margin="0,4">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Button Classes="Tertiary Small" Classes.Active="{Binding Active}" Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" HorizontalAlignment="Left"  Margin="4,0">
+						<Button Classes="Tertiary Small" Classes.Active="{Binding Active}" Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" HorizontalAlignment="Left"  Margin="4,0"  IsVisible="{Binding IsVisible}" IsEnabled="{Binding Enable}">
 							<Button.Styles>
 								<Style Selector="Button.Active">
 									<Setter Property="Theme" Value="{DynamicResource SolidButton}" />

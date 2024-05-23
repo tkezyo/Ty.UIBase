@@ -15,8 +15,9 @@ namespace Ty
         public required string GroupName { get; set; }
         public string? Icon { get; set; }
         public Color? Color { get; set; }
-        public bool Enable { get; set; }
-        public bool Show { get; set; }
+        public bool Enable { get; set; } = true;
+        public bool Show { get; set; } = true;
+        public string[]? Permissions { get; init; }
         /// <summary>
         /// 视图模型
         /// </summary>
