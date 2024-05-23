@@ -27,9 +27,9 @@ namespace Test1.Avalonia.ViewModels
         {
             var r = await _messageBoxManager.Prompt.Handle(new PromptInfo("输入"));
 
-            if (r.Ok)
+            if (r.Ok && !string.IsNullOrEmpty(r.Value))
             {
-                _menuService.ChangeDisplayName(UrlPathSegment, r.Value);
+                _menuService.ChangeDisplayName(UrlPathSegment!, r.Value);
                 _permissionService.AddPermission("11");
             }
         }

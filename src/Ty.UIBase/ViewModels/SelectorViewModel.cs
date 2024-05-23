@@ -13,14 +13,17 @@ namespace Ty.ViewModels
         bool IsSelected { get; set; }
     }
     /// <summary>
-    ///     SelectorViewModel = new SelectorViewModel<PatientViewModel>(Entities);
-    ///     // 加载页面订阅勾选事件
+    /// 加载页面订阅勾选事件
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <remarks>
+    ///     SelectorViewModel = new SelectorViewModel{PatientViewModel}(Entities);
+    ///      加载页面订阅勾选事件
     ///     LoadCommand.Subscribe(c =>
     ///     {
     ///         SelectorViewModel.IsSelectAllValueChanged(true);
     ///     });
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// </remarks>
     public class SelectorViewModel<T> : ReactiveObject
         where T : ReactiveObject, ICanSelector
     {
@@ -42,7 +45,7 @@ namespace Ty.ViewModels
         /// <summary>
         /// 储存勾选的信息的Guid
         /// </summary>
-        public List<Guid> Seleted { get; set; } = new();
+        public List<Guid> Seleted { get; set; } = [];
 
         /// <summary>
         /// 全选；全不选

@@ -21,7 +21,7 @@ namespace Ty.Services
         /// <summary>
         /// HasPermission("permissionName").ToProperty(this, x => x.Admin, out admin);
         /// </summary>
-        /// <param name="permission"></param>
+        /// <param name="permissions"></param>
         /// <returns></returns>
         public IObservable<bool> HasPermission(params string[] permissions)
         {

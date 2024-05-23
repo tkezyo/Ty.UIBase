@@ -18,7 +18,7 @@ namespace Ty.ViewModels
 
         public RoutingState Router { get; } = new RoutingState(RxApp.MainThreadScheduler);
 
-        public ObservableCollection<MenuViewModel> GetParent(string[] levels, int level, ObservableCollection<MenuViewModel> list)
+        public static ObservableCollection<MenuViewModel> GetParent(string[] levels, int level, ObservableCollection<MenuViewModel> list)
         {
             if (levels.Length == level)
             {
