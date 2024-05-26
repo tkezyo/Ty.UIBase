@@ -10,7 +10,10 @@ namespace Test1.WPF
     public partial class App : Application
     {
 
-    
+        public App()
+        {
+            InitializeComponent();
+        }
     }
 
 }

@@ -32,59 +32,46 @@
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
         <!--logo-->
-        <Image Visibility="{DynamicResource IsVisible}" Style="{StaticResource TyLogo}"></Image>
+        <TextBlock Text="Logo" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"></TextBlock>
         <!--主菜单-->
-        <ItemsControl ItemsSource="{Binding Menus}" Style="{StaticResource TyMainMenuBox}" x:Name="menu">
+        <ItemsControl ItemsSource="{Binding Menus}"  x:Name="menu" Grid.Row="0" Grid.Column="1">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button  Command="{Binding DataContext.ToolCommand,ElementName=page}" CommandParameter="{Binding .}" Style="{StaticResource TyMainMenuItem}"
-                               Visibility="{Binding Show,Converter={StaticResource BooleanToVisibilityConverter}}"
+                    <Button  Command="{Binding DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" 
+                               Visibility="{Binding Show,Converter={StaticResource Boolean2VisibilityConverter}}"
                                Foreground="{Binding Color,Converter={StaticResource colorToBrushConverter}}"
-                             IsEnabled="{Binding Enable}"
+                             IsEnabled="{Binding Enable}" 
                              >
                         <StackPanel Orientation="Vertical">
-                            <TextBlock Text="{Binding Icon}" Style="{StaticResource SmallIconTBlockStyle}"/>
-                            <TextBlock Text="{Binding DisplayName}" Style="{StaticResource TBlockStyle1}" />
+                            <TextBlock Text="{Binding DisplayName}" />
+                            <TextBlock Text="{Binding Icon}"/>
                         </StackPanel>
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <!--子菜单-->
-        <ItemsControl ItemsSource="{Binding	SelectedItem.Children,ElementName=menu}" Style="{StaticResource TySubMenuBox}">
+      
+        <!--工具栏-->
+
+        <ItemsControl ItemsSource="{Binding Tools}" Grid.Row="1" Grid.Column="2">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button Content="{Binding DisplayName}"
-                              Visibility="{Binding Show,Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Foreground="{Binding Color,Converter={StaticResource colorToBrushConverter}}"
-                              IsEnabled="{Binding Enable}"
-                                        Command="{Binding DataContext.ToolCommand,ElementName=page}" CommandParameter="{Binding	 .}"
-                               >
+                    <Button       
+                                Visibility="{Binding Show,Converter={StaticResource Boolean2VisibilityConverter}}"
+                                Foreground="{Binding Color,Converter={StaticResource colorToBrushConverter}}"
+                                        IsEnabled="{Binding Enable}"
+                                        Command="{Binding DataContext.ToolCommand,ElementName=page}" CommandParameter="{Binding	 Name}">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{Binding Icon}"  ToolTip="{Binding DisplayName}"/>
+                            <TextBlock Text="{Binding DisplayName}"/>
+                        </StackPanel>
                     </Button>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        <!--工具栏-->
-        <StackPanel  Style="{StaticResource TyToolBox}">
-            <ItemsControl ItemsSource="{Binding Tools}" Style="{StaticResource TyTools}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button       
-                                Visibility="{Binding Show,Converter={StaticResource BooleanToVisibilityConverter}}"
-                                Foreground="{Binding Color,Converter={StaticResource colorToBrushConverter}}"
-                                        IsEnabled="{Binding Enable}"
-                                        Command="{Binding DataContext.ToolCommand,ElementName=page}" CommandParameter="{Binding	 Name}" Style="{StaticResource TyToolItem}">
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock Text="{Binding Icon}" Style="{StaticResource BigIconTBlockStyle}" ToolTip="{Binding DisplayName}"/>
-                                <TextBlock Text="{Binding DisplayName}" Style="{StaticResource TBlockStyle1}"/>
-                            </StackPanel>
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+
         <!--主页内容-->
-        <Border Style="{StaticResource TyContextBox}" >
+        <Border Grid.Row="2" Grid.Column="2" >
             <rxui:RoutedViewHost  Router="{Binding Router}" Transition="Fade" Duration="0" >
                 <rxui:RoutedViewHost.DefaultContent>
                     <TextBlock Text="载入中。。"

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using System.Drawing;
 using Ty;
+using Ty.ViewModels;
 using Ty.Views;
 
 namespace Test1.WPF
@@ -16,8 +18,15 @@ namespace Test1.WPF
 
             builder.Services.Configure<PageOptions>(options =>
             {
+                options.FirstLoadPage = typeof(LayoutViewModel);
                 options.Title = "配置编辑器";
             });
+            builder.Services.Configure<MenuOptions>(options =>
+            {
+                options.Menus.Add(new MenuInfo { DisplayName = "123", GroupName = "123", Name = "Menu.345",Color = Color.Black});
+            });
+
+
 
             return Task.CompletedTask;
         }

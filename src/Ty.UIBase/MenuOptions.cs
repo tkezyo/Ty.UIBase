@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using Ty.Services.Configs;
 
 namespace Ty
 {
@@ -24,4 +25,23 @@ namespace Ty
         public Type? ViewModel { get; set; }
     }
 
+    public class CustomPageOption
+    {
+        public required string RootPath { get; set; }
+        public required string Name { get; set; }
+
+        /// <summary>
+        /// 包含所有的步骤及转换器
+        /// </summary>
+        public Dictionary<string, List<CustomViewDefinition>> Group { get; set; } = [];
+    }
+    public class CustomViewDefinition
+    {
+        public required string Category { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public required string Name { get; set; }
+        public List<ConfigModel> Data { get; set; } = [];
+    }
 }
