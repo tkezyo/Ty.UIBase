@@ -74,7 +74,7 @@ namespace Ty.Controls
             {
                 //如果是第一个则不处理
                 var index = config.Properties.IndexOf(configViewModel);
-                if (index == 0)
+                if (index == config.Properties.Count - 1)
                 {
                     return;
                 }

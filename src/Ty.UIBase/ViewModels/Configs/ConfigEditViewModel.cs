@@ -64,7 +64,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
     /// <param name="config"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    JsonNode SetJsonNode(ConfigViewModel config)
+    static JsonNode SetJsonNode(ConfigViewModel config)
     {
         if (config.Required)
         {
@@ -483,8 +483,6 @@ public class ConfigEditViewModel : ReactiveValidationObject
 
 
     }
-
-
 
     public ReactiveCommand<ConfigViewModel, Unit> SetObjectCommand { get; }
     public void SetObject(ConfigViewModel configViewModel)

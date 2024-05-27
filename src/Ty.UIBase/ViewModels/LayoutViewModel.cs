@@ -58,8 +58,7 @@ namespace Ty.ViewModels
                     var parent = GetParent(levels, 2, levels[0] switch
                     {
                         "Tools" => Tools,
-                        "Navi" => Navi,
-                        _ => Menus
+                        _ => Navi
                     });
 
                     switch (change.Reason)
@@ -124,9 +123,6 @@ namespace Ty.ViewModels
         public ObservableCollection<MenuViewModel> Navi { get; set; } = [];
 
         [Reactive]
-        public ObservableCollection<MenuViewModel> Menus { get; set; } = [];
-
-        [Reactive]
         public ObservableCollection<MenuViewModel> SubNavi { get; set; } = [];
 
         public virtual async Task MenuExecute(MenuViewModel menu)
@@ -145,8 +141,7 @@ namespace Ty.ViewModels
             var parent = GetParent(levels, 2, levels[0] switch
             {
                 "Tools" => Tools,
-                "Navi" => Navi,
-                _ => Menus
+                _ => Navi
             });
             var current = parent.FirstOrDefault(x => x.Name == menu.Name);
             if (current is not null)
@@ -162,8 +157,6 @@ namespace Ty.ViewModels
                     SubNavi = current.Children;
                 }
             }
-
-
         }
     }
 
@@ -184,7 +177,8 @@ namespace Ty.ViewModels
             Show = menuInfo.Show;
             Color = menuInfo.Color;
             ViewModel = menuInfo.ViewModel;
-            MenuExecuteCommand = ReactiveCommand.CreateFromTask(reactiveCommand, Observable.Return(ViewModel is not null));
+            MenuExecuteCommand = ReactiveCommand.CreateFromTask(reactiveCommand);
+
 
 
             var hasPermission = (menuInfo.Permissions is null || menuInfo.Permissions.Length == 0)

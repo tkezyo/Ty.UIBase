@@ -31,25 +31,19 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <Menu ItemsSource="{Binding Menus}" Grid.Row="0" Grid.ColumnSpan="4" Style="{StaticResource Menu.Small}">
-            <Menu.ItemTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type vms:MenuViewModel}" ItemsSource="{Binding Children}">
-                        <MenuItem Header="{Binding DisplayName}"
-                                  IsEnabled="{Binding Enable}"
-                                   Visibility="{Binding IsVisible,Converter={StaticResource Boolean2VisibilityConverter}}"
-                            Command="{Binding MenuExecuteCommand}" 
-                            CommandParameter="{Binding .}" >
-                        </MenuItem>
-                </HierarchicalDataTemplate>
-            </Menu.ItemTemplate>
-        </Menu>
         <!--logo-->
         <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"></TextBlock>
         <!--主菜单-->
         <ItemsControl ItemsSource="{Binding Navi}"  x:Name="menu" Grid.Row="1" Grid.Column="1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Button  Command="{Binding DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" 
+                    <Button  Command="{Binding MenuExecuteCommand}"
+                             CommandParameter="{Binding .}" 
                                Visibility="{Binding Show,Converter={StaticResource Boolean2VisibilityConverter}}"
                                Foreground="{Binding Color,Converter={StaticResource colorToBrushConverter}}"
                              IsEnabled="{Binding Enable}" 
