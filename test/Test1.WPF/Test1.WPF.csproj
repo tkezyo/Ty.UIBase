@@ -21,6 +21,7 @@
 	<ItemGroup>
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.secrets.json" />
+		<None Remove="Views\ConfigTestView.xaml" />
 		<Content Include="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>

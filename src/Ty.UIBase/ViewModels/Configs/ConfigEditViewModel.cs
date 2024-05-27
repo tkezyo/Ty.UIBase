@@ -14,9 +14,11 @@ using Ty.Services.Configs;
 
 namespace Ty.ViewModels.Configs;
 
-public class ConfigEditViewModel : ViewModelBase
+public class ConfigEditViewModel : ReactiveValidationObject
 {
-    public ConfigEditViewModel()
+    private readonly ConfigManager _configManager;
+
+    public ConfigEditViewModel(ConfigManager configManager)
     {
         AddPropertyCommand = ReactiveCommand.Create<ConfigViewModel>(AddProperty);
         AddArrayCommand = ReactiveCommand.Create<ConfigViewModel>(AddArray);
@@ -31,27 +33,19 @@ public class ConfigEditViewModel : ViewModelBase
         {
             this.ValidationContext.Remove(c.ValidationContext);
         });
+        this._configManager = configManager;
     }
 
 
     public ObservableCollection<ConfigViewModel> Configs { get; set; } = [];
-    private List<ConfigModel>? _configModels;
 
-    public void LoadConfig(List<ConfigModel> configModels, JsonObject config)
+    public void LoadConfig(List<PropertyModel> configModels, JsonObject? config)
     {
-        _configModels = configModels;
-
-        //转换为ViewModel
-        var main = _configModels?.FirstOrDefault(c => c.MainType);
-
-        if (main is not null)
+        Configs.Clear();
+        foreach (var property in configModels)
         {
-            foreach (var property in main.PropertyModels)
-            {
-                SetConfigViewModel(property, config, _configModels, Configs);
-            }
+            SetConfigViewModel(property, config, Configs);
         }
-
     }
     public JsonObject? GetResult()
     {
@@ -70,7 +64,7 @@ public class ConfigEditViewModel : ViewModelBase
     /// <param name="config"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    static JsonNode SetJsonNode(ConfigViewModel config)
+    JsonNode SetJsonNode(ConfigViewModel config)
     {
         if (config.Required)
         {
@@ -224,9 +218,8 @@ public class ConfigEditViewModel : ViewModelBase
     /// </summary>
     /// <param name="propertyModel"></param>
     /// <param name="config"></param>
-    /// <param name="definition"></param>
     /// <param name="configViewModel"></param>
-    static void SetConfigViewModel(PropertyModel propertyModel, JsonObject? config, List<ConfigModel>? definition, ObservableCollection<ConfigViewModel> configViewModel)
+    void SetConfigViewModel(PropertyModel propertyModel, JsonObject? config, ObservableCollection<ConfigViewModel> configViewModel)
     {
         var configViewModelProperty = new ConfigViewModel(propertyModel.Name)
         {
@@ -260,14 +253,13 @@ public class ConfigEditViewModel : ViewModelBase
         {
             if (propertyModel.Type == ConfigModelType.Object && config[propertyModel.Name] is JsonObject jsonObj)
             {
-                var sub = definition?.FirstOrDefault(c => !c.MainType && c.TypeName == propertyModel.SubTypeName);
-
-                if (sub is not null)
+                var properties = _configManager.GetConfigModel(propertyModel.SubTypeName);
+                if (properties is not null)
                 {
                     configViewModelProperty.Value = "create";
-                    foreach (var item in sub.PropertyModels)
+                    foreach (var item in properties)
                     {
-                        SetConfigViewModel(item, jsonObj, definition, configViewModelProperty.Properties);
+                        SetConfigViewModel(item, jsonObj, configViewModelProperty.Properties);
                     }
                 }
             }
@@ -349,13 +341,13 @@ public class ConfigEditViewModel : ViewModelBase
 
                         if (propertyModel.SubType == ConfigModelType.Object)
                         {
-                            var sub = definition?.FirstOrDefault(c => !c.MainType && c.TypeName == propertyModel.SubTypeName);
-                            if (sub is not null)
+                            var properties = _configManager.GetConfigModel(propertyModel.SubTypeName);
+                            if (properties is not null)
                             {
                                 subConfigViewModel.Value = "create";
-                                foreach (var item1 in sub.PropertyModels)
+                                foreach (var item in properties)
                                 {
-                                    SetConfigViewModel(item1, jsonNode as JsonObject, definition, subConfigViewModel.Properties);
+                                    SetConfigViewModel(item, jsonNode as JsonObject, subConfigViewModel.Properties);
                                 }
                             }
                         }
@@ -475,15 +467,15 @@ public class ConfigEditViewModel : ViewModelBase
 
             if (configViewModel.SubType == ConfigModelType.Object)
             {
-                var property = _configModels?.FirstOrDefault(c => c.TypeName == configViewModel.SubTypeName);
-                if (property is null)
+                var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+                if (properties is null)
                 {
                     return;
                 }
                 configViewModel1.Value = "create";
-                foreach (var item in property.PropertyModels)
+                foreach (var item in properties)
                 {
-                    SetConfigViewModel(item, [], _configModels, configViewModel1.Properties);
+                    SetConfigViewModel(item, [], configViewModel1.Properties);
                 }
             }
             configViewModel.Properties.Add(configViewModel1);
@@ -497,16 +489,15 @@ public class ConfigEditViewModel : ViewModelBase
     public ReactiveCommand<ConfigViewModel, Unit> SetObjectCommand { get; }
     public void SetObject(ConfigViewModel configViewModel)
     {
-        var sub = _configModels?.FirstOrDefault(c => !c.MainType && c.TypeName == configViewModel.SubTypeName);
-
-        configViewModel.Value = "create";
-
-        if (sub is not null)
+        var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+        if (properties is null)
         {
-            foreach (var item in sub.PropertyModels)
-            {
-                SetConfigViewModel(item, [], _configModels, configViewModel.Properties);
-            }
+            return;
+        }
+        configViewModel.Value = "create";
+        foreach (var item in properties)
+        {
+            SetConfigViewModel(item, [], configViewModel.Properties);
         }
     }
 
@@ -522,15 +513,15 @@ public class ConfigEditViewModel : ViewModelBase
             configViewModel1.SetValidationRule();
             if (configViewModel.SubType == ConfigModelType.Object)
             {
-                var property = _configModels?.FirstOrDefault(c => c.TypeName == configViewModel.SubTypeName);
-                if (property is null)
+                var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+                if (properties is null)
                 {
                     return;
                 }
-                configViewModel1.Value = "create";
-                foreach (var item in property.PropertyModels)
+                configViewModel.Value = "create";
+                foreach (var item in properties)
                 {
-                    SetConfigViewModel(item, [], _configModels, configViewModel1.Properties);
+                    SetConfigViewModel(item, [], configViewModel.Properties);
                 }
             }
             configViewModel.Properties.Add(configViewModel1);
@@ -581,17 +572,15 @@ public class ConfigEditViewModel : ViewModelBase
             //如果是对象，需要转换为JsonObject,然后递归设置
             var jsonObj = JsonSerializer.Deserialize<JsonObject>(json);
 
-            var property = _configModels?.FirstOrDefault(c => c.TypeName == configViewModel.SubTypeName);
-
-            if (property is null)
+            var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+            if (properties is null)
             {
                 return;
             }
-
-            configViewModel.Properties.Clear();
-            foreach (var item in property.PropertyModels)
+            configViewModel.Value = "create";
+            foreach (var item in properties)
             {
-                SetConfigViewModel(item, jsonObj, _configModels, configViewModel.Properties);
+                SetConfigViewModel(item, jsonObj, configViewModel.Properties);
             }
         }
         else if (configViewModel.Type == ConfigModelType.Array)
@@ -673,15 +662,16 @@ public class ConfigEditViewModel : ViewModelBase
 
                     if (configViewModel.SubType == ConfigModelType.Object)
                     {
-                        var sub = _configModels?.FirstOrDefault(c => !c.MainType && c.TypeName == configViewModel.SubTypeName);
-                        if (sub is not null)
+                        var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+                        if (properties is not null)
                         {
                             subConfigViewModel.Value = "create";
-                            foreach (var item1 in sub.PropertyModels)
+                            foreach (var item1 in properties)
                             {
-                                SetConfigViewModel(item1, jsonNode as JsonObject, _configModels, subConfigViewModel.Properties);
+                                SetConfigViewModel(item1, jsonNode as JsonObject, subConfigViewModel.Properties);
                             }
                         }
+
                     }
                     else
                     {

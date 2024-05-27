@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Drawing;
+using Test1.WPF.ViewModels;
+using Test1.WPF.Views;
 using Ty;
 using Ty.ViewModels;
 using Ty.Views;
@@ -16,6 +18,8 @@ namespace Test1.WPF
             builder.Services.AddHostedService<WpfHostedService<App, MainWindow>>();
             builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
+            builder.Services.AddTransientView<ConfigTestViewModel, ConfigTestView>();
+
             builder.Services.Configure<PageOptions>(options =>
             {
                 options.FirstLoadPage = typeof(LayoutViewModel);
@@ -23,7 +27,11 @@ namespace Test1.WPF
             });
             builder.Services.Configure<MenuOptions>(options =>
             {
-                options.Menus.Add(new MenuInfo { DisplayName = "123", GroupName = "123", Name = "Menu.345",Color = Color.Black});
+                options.Menus.Add(new MenuInfo { DisplayName = "ttt", GroupName = "ttt", Name = "Menu.345", Color = Color.Black, ViewModel = typeof(ConfigTestViewModel) });
+                options.Menus.Add(new MenuInfo { DisplayName = "123", GroupName = "123", Name = "Menu.123", Color = Color.Black });
+                options.Menus.Add(new MenuInfo { DisplayName = "345", GroupName = "345", Name = "Menu.123.345" });
+                options.Menus.Add(new MenuInfo { DisplayName = "789", GroupName = "789", Name = "Menu.123.345.789", ViewModel = typeof(ConfigTestViewModel) });
+
             });
 
 

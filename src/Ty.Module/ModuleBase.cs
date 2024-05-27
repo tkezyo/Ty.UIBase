@@ -61,7 +61,7 @@ public interface IModule
     {
         SkipVerification = skipVerification;
         List<IModule> modules = [];
-        if (!string.IsNullOrEmpty(dependsOnFolder))
+        if (!string.IsNullOrEmpty(dependsOnFolder) && Directory.Exists(dependsOnFolder))
         {
             //读取 dlls文件夹下的所有 dll文件，然后加载
             var files = Directory.GetFiles(dependsOnFolder, "*.dll");

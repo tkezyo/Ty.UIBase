@@ -25,6 +25,9 @@ namespace Ty
             builder.Services.AddTransientView<PromptDialogViewModel, PromptDialog>();
             builder.Services.AddTransient<MainWindow>();
 
+            builder.Services.Configure<MenuOptions>(options =>
+            {
+                  });
             return Task.CompletedTask;
         }
     }

@@ -103,8 +103,8 @@ public class CustomPageViewModel : ViewModelBase
         CurrentBox.ViewName = name;
         var r = _customPageOption.Group[CurrentBox.ViewCategory].First(c => c.Name == name);
 
-
-        CurrentBox.Inputs = new ConfigEditViewModel();
+        var configEditVM = _serviceProvider.GetRequiredService<ConfigEditViewModel>();
+        CurrentBox.Inputs = configEditVM;
         CurrentBox.Inputs.LoadConfig(r.Data, new JsonObject());
 
         Reload();
@@ -113,7 +113,7 @@ public class CustomPageViewModel : ViewModelBase
 
     public void Reload(string? group = null)
     {
-       
+
     }
     public ReactiveCommand<bool, Unit> AddHeightCommand { get; }
     public void AddHeight(bool c)
@@ -262,9 +262,9 @@ public class CustomPageViewModel : ViewModelBase
                     ViewName = box.ViewName,
                     ViewCategory = box.ViewGroup,
                     Size = new SpikeBoxResizableViewModel() { Height = box.Size.Height, Width = box.Size.Width, Left = box.Size.Left, Top = box.Size.Top },
-                    Inputs = new ConfigEditViewModel()
+                    Inputs = _serviceProvider.GetRequiredService<ConfigEditViewModel>()
                 };
-                boxViewModel.Inputs = new ConfigEditViewModel();
+             
                 boxViewModel.Inputs.LoadConfig(_customPageOption.Group[box.ViewGroup].First(c => c.Name == box.ViewName).Data, box.Inputs);
                 var vm = _serviceProvider.GetKeyedService<ICustomPageInjectViewModel>(boxViewModel.ViewCategory + ":" + boxViewModel.ViewName);
                 if (vm is ICustomPageViewModel sVm)

@@ -1,14 +1,5 @@
 ﻿namespace Ty.Services.Configs;
 
-public class ConfigModel
-{
-    public required string TypeName { get; set; }
-    /// <summary>
-    /// 如果是主类型，那么主类型中的属性将会被展开
-    /// </summary>
-    public bool MainType { get; set; }
-    public List<PropertyModel> PropertyModels { get; set; } = [];
-}
 public class PropertyModel(string name)
 {
     public string Name { get; set; } = name;
@@ -42,6 +33,8 @@ public class PropertyModel(string name)
 
     public string? OptionProvider { get; set; }
     public List<KeyValuePair<string, string>>? Options { get; set; }
+
+    public List<string> SubTypeNames { get; set; } = [];
 }
 
 public enum ConfigModelType

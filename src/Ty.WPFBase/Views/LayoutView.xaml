@@ -31,10 +31,22 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
+        <Menu ItemsSource="{Binding Menus}" Grid.Row="0" Grid.ColumnSpan="4" Style="{StaticResource Menu.Small}">
+            <Menu.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type vms:MenuViewModel}" ItemsSource="{Binding Children}">
+                        <MenuItem Header="{Binding DisplayName}"
+                                  IsEnabled="{Binding Enable}"
+                                   Visibility="{Binding IsVisible,Converter={StaticResource Boolean2VisibilityConverter}}"
+                            Command="{Binding MenuExecuteCommand}" 
+                            CommandParameter="{Binding .}" >
+                        </MenuItem>
+                </HierarchicalDataTemplate>
+            </Menu.ItemTemplate>
+        </Menu>
         <!--logo-->
-        <TextBlock Text="Logo" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0"></TextBlock>
+        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"></TextBlock>
         <!--主菜单-->
-        <ItemsControl ItemsSource="{Binding Menus}"  x:Name="menu" Grid.Row="0" Grid.Column="1">
+        <ItemsControl ItemsSource="{Binding Navi}"  x:Name="menu" Grid.Row="1" Grid.Column="1">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Button  Command="{Binding DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" 
@@ -50,7 +62,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-      
+
         <!--工具栏-->
 
         <ItemsControl ItemsSource="{Binding Tools}" Grid.Row="1" Grid.Column="2">
@@ -71,7 +83,7 @@
         </ItemsControl>
 
         <!--主页内容-->
-        <Border Grid.Row="2" Grid.Column="2" >
+        <Border Grid.Row="2" Grid.Column="2" BorderBrush="Gray" BorderThickness="1,1,0,0" CornerRadius="3,0,0,0">
             <rxui:RoutedViewHost  Router="{Binding Router}" Transition="Fade" Duration="0" >
                 <rxui:RoutedViewHost.DefaultContent>
                     <TextBlock Text="载入中。。"

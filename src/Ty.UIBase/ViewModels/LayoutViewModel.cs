@@ -45,7 +45,6 @@ namespace Ty.ViewModels
         {
             _kHToolOptions = options.Value;
             ShowThemeToggle = _kHToolOptions.ShowThemeToggle;
-            MenuExecuteCommand = ReactiveCommand.CreateFromTask<MenuViewModel>(MenuExecute);
             UrlPathSegment = "Layout";
             this._menuService = menuService;
             this._permissionService = permissionService;
@@ -59,13 +58,14 @@ namespace Ty.ViewModels
                     var parent = GetParent(levels, 2, levels[0] switch
                     {
                         "Tools" => Tools,
+                        "Navi" => Navi,
                         _ => Menus
                     });
 
                     switch (change.Reason)
                     {
                         case ChangeReason.Add:
-                            parent.Add(new(change.Current, _permissionService));
+                            parent.Add(new(change.Current, _permissionService, MenuExecute));
                             // 处理添加事件
                             break;
                         case ChangeReason.Update:
@@ -103,9 +103,9 @@ namespace Ty.ViewModels
 
         public override async Task Activate()
         {
-            if (Menus.Count > 0)
+            if (Navi.Count > 0)
             {
-                await MenuExecute(Menus.First(c => c.IsVisible));
+                await MenuExecute(Navi.First(c => c.IsVisible));
             }
         }
 
@@ -121,12 +121,14 @@ namespace Ty.ViewModels
         public ObservableCollection<MenuViewModel> Tools { get; set; } = [];
 
         [Reactive]
+        public ObservableCollection<MenuViewModel> Navi { get; set; } = [];
+
+        [Reactive]
         public ObservableCollection<MenuViewModel> Menus { get; set; } = [];
 
         [Reactive]
-        public ObservableCollection<MenuViewModel> SubMenus { get; set; } = [];
+        public ObservableCollection<MenuViewModel> SubNavi { get; set; } = [];
 
-        public ReactiveCommand<MenuViewModel, Unit> MenuExecuteCommand { get; }
         public virtual async Task MenuExecute(MenuViewModel menu)
         {
             await Task.CompletedTask;
@@ -143,6 +145,7 @@ namespace Ty.ViewModels
             var parent = GetParent(levels, 2, levels[0] switch
             {
                 "Tools" => Tools,
+                "Navi" => Navi,
                 _ => Menus
             });
             var current = parent.FirstOrDefault(x => x.Name == menu.Name);
@@ -156,7 +159,7 @@ namespace Ty.ViewModels
                 current.Active = true;
                 if (levels.Length == 2)
                 {
-                    SubMenus = current.Children;
+                    SubNavi = current.Children;
                 }
             }
 
@@ -169,8 +172,9 @@ namespace Ty.ViewModels
         private readonly ObservableAsPropertyHelper<bool> _isVisible;
         public bool IsVisible => _isVisible.Value;
 
+        public ReactiveCommand<MenuViewModel, Unit> MenuExecuteCommand { get; }
 
-        public MenuViewModel(MenuInfo menuInfo, PermissionService permissionService)
+        public MenuViewModel(MenuInfo menuInfo, PermissionService permissionService, Func<MenuViewModel, Task> reactiveCommand)
         {
             Name = menuInfo.Name.Split('.')[^1];
             FullName = menuInfo.Name;
@@ -180,6 +184,8 @@ namespace Ty.ViewModels
             Show = menuInfo.Show;
             Color = menuInfo.Color;
             ViewModel = menuInfo.ViewModel;
+            MenuExecuteCommand = ReactiveCommand.CreateFromTask(reactiveCommand, Observable.Return(ViewModel is not null));
+
 
             var hasPermission = (menuInfo.Permissions is null || menuInfo.Permissions.Length == 0)
                     ? Observable.Return(true)
@@ -189,8 +195,6 @@ namespace Ty.ViewModels
             _isVisible = hasPermission.CombineLatest(show, (permission, show) => permission && show)
                 .ToProperty(this, x => x.IsVisible);
         }
-
-
 
         /// <summary>
         /// 名称

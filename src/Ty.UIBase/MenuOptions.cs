@@ -15,7 +15,7 @@ namespace Ty
         public required string DisplayName { get; set; }
         public required string GroupName { get; set; }
         public string? Icon { get; set; }
-        public Color? Color { get; set; }
+        public Color? Color { get; set; } 
         public bool Enable { get; set; } = true;
         public bool Show { get; set; } = true;
         public string[]? Permissions { get; init; }
@@ -42,6 +42,6 @@ namespace Ty
         /// 名称
         /// </summary>
         public required string Name { get; set; }
-        public List<ConfigModel> Data { get; set; } = [];
+        public List<PropertyModel> Data { get; set; } = [];
     }
 }
