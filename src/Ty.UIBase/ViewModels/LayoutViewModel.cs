@@ -50,54 +50,7 @@ namespace Ty.ViewModels
             this._permissionService = permissionService;
             Title = options1.Value.Title ?? "测试";
 
-            _menuService.Menus.Connect().Subscribe(c =>
-            {
-                foreach (var change in c)
-                {
-                    var levels = change.Current.Name.Split('.');
-                    var parent = GetParent(levels, 2, levels[0] switch
-                    {
-                        "Tools" => Tools,
-                        _ => Navi
-                    });
-
-                    switch (change.Reason)
-                    {
-                        case ChangeReason.Add:
-                            parent.Add(new(change.Current, _permissionService, MenuExecute));
-                            // 处理添加事件
-                            break;
-                        case ChangeReason.Update:
-                        case ChangeReason.Refresh:
-                            {
-                                var p = parent.FirstOrDefault(v => v.FullName == change.Current.Name);
-
-                                if (p is not null)
-                                {
-                                    p.DisplayName = change.Current.DisplayName;
-                                    p.Icon = change.Current.Icon;
-                                    p.Color = change.Current.Color;
-                                    p.Enable = change.Current.Enable;
-                                    p.Show = change.Current.Show;
-                                }
-                            }
-                            // 处理更新事件
-                            break;
-                        case ChangeReason.Remove:
-                            {
-                                var p = parent.FirstOrDefault(v => v.FullName == change.Current.Name);
-                                if (p is not null)
-                                {
-                                    parent.Remove(p);
-                                }
-                            }
-
-                            // 处理删除事件
-                            break;
-                            // 其他更改原因
-                    }
-                }
-            });
+            _menuService.CreateMenu("Menu", Navi, MenuExecute);
         }
 
         public override async Task Activate()
