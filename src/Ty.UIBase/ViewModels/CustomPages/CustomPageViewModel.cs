@@ -9,6 +9,7 @@ using Ty.Services;
 using System.Text.Json.Nodes;
 using Ty.ViewModels.Configs;
 using Microsoft.Extensions.Options;
+using System;
 
 namespace Ty.ViewModels.CustomPages;
 
@@ -53,6 +54,11 @@ public class CustomPageViewModel : ViewModelBase
             Reload();
         });
 
+        foreach (var item in options.Value.Group.Keys)
+        {
+            CustomGroups.Add(item);
+        }
+
         LoadMenu();
     }
 
@@ -61,7 +67,7 @@ public class CustomPageViewModel : ViewModelBase
 
     public override async Task Activate()
     {
-       await LoadTabs();
+        await LoadTabs();
     }
 
     public async Task ToolExecute(MenuViewModel menuViewModel)
@@ -70,6 +76,7 @@ public class CustomPageViewModel : ViewModelBase
         {
             case "Menu.自定义页面.编辑":
                 ChangeEdit();
+                LoadMenu();
                 break;
             case "Menu.自定义页面.保存":
                 await Save();
@@ -91,6 +98,9 @@ public class CustomPageViewModel : ViewModelBase
                 break;
             case "Menu.自定义页面.标签.添加盒子":
                 await AddBoxAsync();
+                break;
+            case "Menu.自定义页面.盒子.删除":
+                DeleteBox();
                 break;
             default:
                 LoadMenu();
@@ -117,8 +127,21 @@ public class CustomPageViewModel : ViewModelBase
                 break;
             default:
                 menuDisposable = _menuService.CreateMenu("Menu.自定义页面", Tools, ToolExecute);
+                if (Edit)
+                {
+                    _menuService.ChangeShow("Menu.自定义页面.保存", true);
+                    _menuService.ChangeShow("Menu.自定义页面.编辑", false);
+                    _menuService.ChangeShow("Menu.自定义页面.标签", true);
+                }
+                else
+                {
+                    _menuService.ChangeShow("Menu.自定义页面.保存", false);
+                    _menuService.ChangeShow("Menu.自定义页面.编辑", true);
+                    _menuService.ChangeShow("Menu.自定义页面.标签", false);
+                }
                 break;
         }
+
     }
 
     public ReactiveCommand<Unit, Unit> ChangeEditCommand { get; }
@@ -293,6 +316,7 @@ public class CustomPageViewModel : ViewModelBase
     public bool Edit { get; set; }
 
 
+
     public ReactiveCommand<Unit, Unit> LoadTabsCommand { get; set; }
     /// <summary>
     /// 通过设备类型获取Tabs
@@ -318,7 +342,7 @@ public class CustomPageViewModel : ViewModelBase
         }
         foreach (var item in JsonSerializer.Deserialize<List<SpikeTab>>(str) ?? [])
         {
-            SpikeTabViewModel spikeTabViewModel = new SpikeTabViewModel() { Name = item.Name };
+            SpikeTabViewModel spikeTabViewModel = new() { Name = item.Name };
             foreach (var box in item.Boxes)
             {
                 var boxViewModel = new SpikeBoxViewModel()
@@ -327,16 +351,16 @@ public class CustomPageViewModel : ViewModelBase
                     ViewName = box.ViewName,
                     ViewCategory = box.ViewGroup,
                     Size = new SpikeBoxResizableViewModel() { Height = box.Size.Height, Width = box.Size.Width, Left = box.Size.Left, Top = box.Size.Top },
-                    Inputs = _serviceProvider.GetRequiredService<ConfigEditViewModel>()
                 };
+                //boxViewModel.Inputs = _serviceProvider.GetRequiredService<ConfigEditViewModel>();
 
-                boxViewModel.Inputs.LoadConfig(_customPageOption.Group[box.ViewGroup].First(c => c.Name == box.ViewName).Data, box.Inputs);
-                var vm = _serviceProvider.GetKeyedService<ICustomPageInjectViewModel>(boxViewModel.ViewCategory + ":" + boxViewModel.ViewName);
-                if (vm is ICustomPageViewModel sVm)
-                {
-                    await sVm.WrapAsync(box.Inputs.Select(c => new NameValue(c.Key, c.Value?.ToString() ?? string.Empty)).ToList(), CancellationToken.None);
-                    boxViewModel.DisplayView(sVm);
-                }
+                //boxViewModel.Inputs.LoadConfig(_customPageOption.Group[box.ViewGroup].First(c => c.Name == box.ViewName).Data, box.Inputs);
+                //var vm = _serviceProvider.GetKeyedService<ICustomPageInjectViewModel>(boxViewModel.ViewCategory + ":" + boxViewModel.ViewName);
+                //if (vm is ICustomPageViewModel sVm)
+                //{
+                //    await sVm.WrapAsync(box.Inputs.Select(c => new NameValue(c.Key, c.Value?.ToString() ?? string.Empty)).ToList(), CancellationToken.None);
+                //    boxViewModel.DisplayView(sVm);
+                //}
                 spikeTabViewModel.Boxes.Add(boxViewModel);
             }
 
@@ -346,6 +370,7 @@ public class CustomPageViewModel : ViewModelBase
         {
             CurrentTab = Tabs[0];
         }
+
     }
     public ReactiveCommand<Unit, Unit> SaveCommand { get; set; }
     public async Task Save()
@@ -384,7 +409,7 @@ public class CustomPageViewModel : ViewModelBase
         }
         CurrentBox = null;
 
-
+        LoadMenu();
     }
 
     [Reactive]
@@ -490,6 +515,7 @@ public class CustomPageViewModel : ViewModelBase
             CurrentBox = spikeBoxViewModel;
             CurrentBox.Editing = true;
             SelectResizable(CurrentBox.Size);
+            LoadMenu("box");
         }
         else
         {
@@ -499,6 +525,7 @@ public class CustomPageViewModel : ViewModelBase
                 CurrentBox = null;
                 SelectResizable(null);
                 Reload();
+                LoadMenu();
 
                 return;
             }
@@ -506,11 +533,10 @@ public class CustomPageViewModel : ViewModelBase
             {
                 CurrentBox = spikeBoxViewModel;
                 CurrentBox.Editing = true;
+                LoadMenu("box");
             }
             SelectResizable(CurrentBox.Size);
         }
-        Reload();
-
     }
     public ReactiveCommand<Unit, Unit> DeleteBoxCommand { get; }
     public void DeleteBox()
@@ -583,7 +609,7 @@ public class SpikeBoxViewModel : ReactiveObject, IScreen
     public string? ViewName { get; set; }
     [Reactive]
     public string? ViewCategory { get; set; }
-
+   
     [Reactive]
     public ICustomPageViewModel? SpikeViewModel { get; set; }
 
@@ -608,34 +634,7 @@ public class SpikeBoxViewModel : ReactiveObject, IScreen
     }
 }
 
-public class SpikeResizableViewModel : ReactiveObject, IResizable
-{
-    [Reactive]
-    public int Height { get; set; } = 100;
-    [Reactive]
-    public int Width { get; set; } = 100;
 
-}
-public class SpikeMoveableViewModel : ReactiveObject, IMoveable
-{
-    [Reactive]
-    public int Left { get; set; } = 50;
-    [Reactive]
-    public int Top { get; set; } = 50;
-
-}
-public class SpikeMoveAndResizableViewModel : ReactiveObject, IResizable, IMoveable
-{
-    [Reactive]
-    public int Left { get; set; }
-    [Reactive]
-    public int Top { get; set; }
-    [Reactive]
-    public int Height { get; set; } = 2;
-    [Reactive]
-    public int Width { get; set; } = 2;
-
-}
 public class SpikeBoxResizableViewModel : ReactiveObject, IResizable, IMoveable
 {
     [Reactive]

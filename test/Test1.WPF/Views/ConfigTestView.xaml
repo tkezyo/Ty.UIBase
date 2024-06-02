@@ -12,5 +12,6 @@
     <StackPanel Orientation="Vertical">
         <Button Content="检查" Command="{Binding ShowResultCommand}"/>
         <configs:ConfigEditView DataContext="{Binding Config}"></configs:ConfigEditView>
+        <ComboBox Style="{StaticResource ComboBoxExtend}"/>
     </StackPanel>
 </rxui:ReactiveUserControl>

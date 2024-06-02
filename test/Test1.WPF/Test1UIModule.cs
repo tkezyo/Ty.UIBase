@@ -36,6 +36,7 @@ namespace Test1.WPF
             builder.Services.Configure<CustomPageOption>(options =>
             {
                 options.RootPath = "D:\\CustomPage";
+                options.Name = "name";
             });
 
 

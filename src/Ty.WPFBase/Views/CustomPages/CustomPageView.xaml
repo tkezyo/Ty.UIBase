@@ -106,16 +106,10 @@
                                       Router="{Binding Router}"  >
                                             <rxui:RoutedViewHost.DefaultContent>
                                                 <ScrollViewer>
-                                                    <ItemsControl ItemsSource="{Binding Inputs}">
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <StackPanel>
-                                                                    <TextBox Text="{Binding Value}" Style="{StaticResource TextBoxExtend.Small}" hc:TitleElement.Title="{Binding DisplayName}" Visibility="{Binding HasOption,Converter={StaticResource Boolean2VisibilityReConverter}}"/>
-                                                                    <ComboBox ItemsSource="{Binding Options}" Style="{StaticResource ComboBoxExtend.Small}" SelectedValue="{Binding Value}" SelectedValuePath="Name"  hc:TitleElement.Title="{Binding DisplayName}" Visibility="{Binding HasOption,Converter={StaticResource Boolean2VisibilityConverter}}" DisplayMemberPath="DisplayName"/>
-                                                                </StackPanel>
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                    </ItemsControl>
+                                                    <StackPanel>
+                                                        <ComboBox ItemsSource="{Binding DataContext.CustomGroups,ElementName=page}" SelectedItem="{Binding ViewCategory}" hc:TitleElement.Title="类别" Style="{StaticResource ComboBoxExtend}"/>
+                                                    </StackPanel>
+
                                                 </ScrollViewer>
                                             </rxui:RoutedViewHost.DefaultContent>
                                             <rxui:RoutedViewHost.ViewLocator>
