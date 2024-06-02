@@ -16,17 +16,15 @@ public class CustomPageViewModel : ViewModelBase
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IMessageBoxManager _messageBoxManager;
+    private readonly MenuService _menuService;
     private readonly CustomPageOption _customPageOption;
 
-    public CustomPageViewModel(IServiceProvider serviceProvider, IMessageBoxManager messageBoxManager, IOptions<CustomPageOption> options)
+    public CustomPageViewModel(IServiceProvider serviceProvider, IMessageBoxManager messageBoxManager, IOptions<CustomPageOption> options, MenuService menuService)
     {
         _serviceProvider = serviceProvider;
         _messageBoxManager = messageBoxManager;
+        this._menuService = menuService;
         _customPageOption = options.Value;
-
-        AddTabCommand = ReactiveCommand.CreateFromTask(AddTab);
-        DeleteTabCommand = ReactiveCommand.Create(DeleteTab);
-        MoveTabCommand = ReactiveCommand.Create<bool>(MoveTab);
 
         AddBoxCommand = ReactiveCommand.CreateFromTask(AddBoxAsync);
         DeleteBoxCommand = ReactiveCommand.Create(DeleteBox);
@@ -54,6 +52,68 @@ public class CustomPageViewModel : ViewModelBase
             }
             Reload();
         });
+
+        LoadMenu();
+    }
+
+    [Reactive]
+    public ObservableCollection<MenuViewModel> Tools { get; set; } = [];
+
+    public async Task ToolExecute(MenuViewModel menuViewModel)
+    {
+        switch (menuViewModel.FullName)
+        {
+            case "Menu.自定义页面.编辑":
+                ChangeEdit();
+                break;
+            case "Menu.自定义页面.保存":
+                await Save();
+                break;
+            case "Menu.自定义页面.标签":
+                LoadMenu("tab");
+                break;
+            case "Menu.自定义页面.标签.添加":
+                await AddTab();
+                break;
+            case "Menu.自定义页面.标签.删除":
+                DeleteTab();
+                break;
+            case "Menu.自定义页面.标签.前移":
+                MoveTab(false);
+                break;
+            case "Menu.自定义页面.标签.后移":
+                MoveTab(true);
+                break;
+            case "Menu.自定义页面.标签.添加盒子":
+                await AddBoxAsync();
+                break;
+            default:
+                LoadMenu();
+                break;
+        }
+
+    }
+    private IDisposable? menuDisposable;
+    public void LoadMenu(string? type = null)
+    {
+        if (menuDisposable is not null)
+        {
+            menuDisposable.Dispose();
+            Tools.Clear();
+        }
+
+        switch (type)
+        {
+            case "tab":
+                menuDisposable = _menuService.CreateMenu("Menu.自定义页面.标签", Tools, ToolExecute);
+                break;
+            case "box":
+                menuDisposable = _menuService.CreateMenu("Menu.自定义页面.盒子", Tools, ToolExecute);
+                break;
+            default:
+                menuDisposable = _menuService.CreateMenu("Menu.自定义页面", Tools, ToolExecute);
+                break;
+        }
     }
 
     public ReactiveCommand<Unit, Unit> ChangeEditCommand { get; }
@@ -264,7 +324,7 @@ public class CustomPageViewModel : ViewModelBase
                     Size = new SpikeBoxResizableViewModel() { Height = box.Size.Height, Width = box.Size.Width, Left = box.Size.Left, Top = box.Size.Top },
                     Inputs = _serviceProvider.GetRequiredService<ConfigEditViewModel>()
                 };
-             
+
                 boxViewModel.Inputs.LoadConfig(_customPageOption.Group[box.ViewGroup].First(c => c.Name == box.ViewName).Data, box.Inputs);
                 var vm = _serviceProvider.GetKeyedService<ICustomPageInjectViewModel>(boxViewModel.ViewCategory + ":" + boxViewModel.ViewName);
                 if (vm is ICustomPageViewModel sVm)
@@ -327,7 +387,6 @@ public class CustomPageViewModel : ViewModelBase
 
     [Reactive]
     public SpikeTabViewModel? CurrentTab { get; set; }
-    public ReactiveCommand<bool, Unit> MoveTabCommand { get; }
     public void MoveTab(bool back)
     {
         if (CurrentTab is null)
@@ -354,7 +413,6 @@ public class CustomPageViewModel : ViewModelBase
         }
         Tabs.Move(old, newIndex);
     }
-    public ReactiveCommand<Unit, Unit> AddTabCommand { get; }
     public async Task AddTab()
     {
         var r = await _messageBoxManager.Prompt.Handle(new PromptInfo("请输入标签名称") { DefaultValue = "New Tab" + (Tabs.Count + 1), OwnerTitle = WindowTitle });
@@ -406,7 +464,6 @@ public class CustomPageViewModel : ViewModelBase
             CurrentTab.Boxes.Add(box);
         }
     }
-    public ReactiveCommand<Unit, Unit> DeleteTabCommand { get; }
     public void DeleteTab()
     {
         if (CurrentTab is null)

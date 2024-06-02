@@ -34,7 +34,7 @@
         <!--logo-->
         <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"></TextBlock>
         <!--主菜单-->
-        <ItemsControl ItemsSource="{Binding Navi}"  x:Name="menu" Grid.Row="1" Grid.Column="1">
+        <ItemsControl ItemsSource="{Binding Navi}"  x:Name="menu" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal"/>

@@ -18,26 +18,6 @@ namespace Ty.ViewModels
 
         public RoutingState Router { get; } = new RoutingState(RxApp.MainThreadScheduler);
 
-        public static ObservableCollection<MenuViewModel> GetParent(string[] levels, int level, ObservableCollection<MenuViewModel> list)
-        {
-            if (levels.Length == level)
-            {
-                return list;
-            }
-            else
-            {
-                var parent = list.FirstOrDefault(x => x.Name == levels[level - 1]);
-                if (parent is not null)
-                {
-                    return GetParent(levels, level + 1, parent.Children);
-                }
-                else
-                {
-                    return list;
-                }
-            }
-        }
-
         [Reactive]
         public string Title { get; set; }
 
@@ -91,7 +71,7 @@ namespace Ty.ViewModels
 
             var levels = menu.FullName.Split('.');
 
-            var parent = GetParent(levels, 2, levels[0] switch
+            var parent = MenuService.GetParent(levels, 2, levels[0] switch
             {
                 "Tools" => Tools,
                 _ => Navi

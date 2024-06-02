@@ -106,14 +106,17 @@ public class MenuService
           {
               foreach (var change in c)
               {
-                  if (!change.Current.Name.StartsWith(name))
+                  if (!change.Current.Name.StartsWith(name) || change.Current.Name == name)
                   {
                       continue;
                   }
 
                   var levels = change.Current.Name.Split('.');
-                  var parent = GetParent(levels, names.Length+1, menus);
-
+                  var parent = GetParent(levels, names.Length + 1, menus);
+                  if (parent is null)
+                  {
+                      continue;
+                  }
                   switch (change.Reason)
                   {
                       case ChangeReason.Add:
@@ -152,7 +155,7 @@ public class MenuService
               }
           });
     }
-    public static ObservableCollection<MenuViewModel> GetParent(string[] levels, int level, ObservableCollection<MenuViewModel> list)
+    public static ObservableCollection<MenuViewModel>? GetParent(string[] levels, int level, ObservableCollection<MenuViewModel> list)
     {
         if (levels.Length == level)
         {
@@ -167,7 +170,7 @@ public class MenuService
             }
             else
             {
-                return list;
+                return null;
             }
         }
     }
