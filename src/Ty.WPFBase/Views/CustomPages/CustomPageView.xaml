@@ -102,8 +102,6 @@
                                         </Button>
                                     </GroupBox.Header>
                                     <Grid>
-
-
                                         <rxui:RoutedViewHost 
                                       Router="{Binding Router}"  >
                                             <rxui:RoutedViewHost.DefaultContent>

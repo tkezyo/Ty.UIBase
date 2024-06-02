@@ -59,6 +59,11 @@ public class CustomPageViewModel : ViewModelBase
     [Reactive]
     public ObservableCollection<MenuViewModel> Tools { get; set; } = [];
 
+    public override async Task Activate()
+    {
+       await LoadTabs();
+    }
+
     public async Task ToolExecute(MenuViewModel menuViewModel)
     {
         switch (menuViewModel.FullName)

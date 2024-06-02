@@ -33,6 +33,10 @@ namespace Test1.WPF
                 options.Menus.Add(new MenuInfo { DisplayName = "789", GroupName = "789", Name = "Menu.123.345.789", ViewModel = typeof(ConfigTestViewModel) });
 
             });
+            builder.Services.Configure<CustomPageOption>(options =>
+            {
+                options.RootPath = "D:\\CustomPage";
+            });
 
 
 
