@@ -162,7 +162,7 @@ public class CustomPageViewModel : ViewModelBase
                     _menuService.ChangeShow("Menu.自定义页面.保存", true);
                     _menuService.ChangeShow("Menu.自定义页面.编辑", false);
                     _menuService.ChangeShow("Menu.自定义页面.标签", true);
-                    _menuService.ChangeShow("Menu.自定义页面.添加盒子", true);
+                    _menuService.ChangeShow("Menu.自定义页面.添加盒子", CurrentTab is not null);
                 }
                 else
                 {
@@ -224,8 +224,8 @@ public class CustomPageViewModel : ViewModelBase
         var r = _customPageOption.Group[CurrentBox.ViewCategory].First(c => c.Name == name);
 
         var configEditVM = _serviceProvider.GetRequiredService<ConfigEditViewModel>();
-        CurrentBox.Inputs = configEditVM;
-        CurrentBox.Inputs.LoadConfig(r.Data, new JsonObject());
+        CurrentBox.ConfigEditViewModel = configEditVM;
+        CurrentBox.ConfigEditViewModel.LoadConfig(r.Data, new JsonObject());
 
         Reload();
     }
@@ -426,7 +426,7 @@ public class CustomPageViewModel : ViewModelBase
             SpikeTab spikeTab = new() { Name = item.Name };
             foreach (var box in item.Boxes)
             {
-                if (box.Router.NavigationStack.Count == 0)
+                if (box.Inputs is null)
                 {
                     continue;
                 }
@@ -436,7 +436,7 @@ public class CustomPageViewModel : ViewModelBase
                     Name = box.Name,
                     ViewName = box.ViewName,
                     ViewCategory = box.ViewCategory,
-                    Inputs = box.Inputs?.GetNameValues(),
+                    Inputs = box.Inputs,
                     Size = new SpikeMoveAndResizable() { Height = box.Size.Height, Width = box.Size.Width, Left = box.Size.Left, Top = box.Size.Top }
                 };
                 spikeTab.Boxes.Add(spikeBox);
@@ -538,8 +538,6 @@ public class CustomPageViewModel : ViewModelBase
 
             var vm = _serviceProvider.GetKeyedService<ICustomPageInjectViewModel>(box.ViewCategory + ":" + box.ViewName);
 
-
-
             if (vm is ICustomPageViewModel sVm)
             {
                 var configEditVM = _serviceProvider.GetRequiredService<ConfigEditViewModel>();
@@ -547,10 +545,8 @@ public class CustomPageViewModel : ViewModelBase
                 if (vinfo is not null)
                 {
                     configEditVM.LoadConfig(vinfo.Data, null);
-                    box.Inputs = configEditVM;
+                    box.ConfigEditViewModel = configEditVM;
                     box.SpikeViewModel = sVm;
-
-                    //box.DisplayView(sVm);
                 }
 
             }
@@ -664,7 +660,9 @@ public class SpikeBoxViewModel : ReactiveObject, IScreen
     public SpikeBoxResizableViewModel Size { get; set; } = new();
 
     [Reactive]
-    public ConfigEditViewModel? Inputs { get; set; }
+    public ConfigEditViewModel? ConfigEditViewModel { get; set; }
+
+    public List<NameValue>? Inputs { get; set; }
 
     [Reactive]
     public RoutingState Router { get; set; } = new RoutingState();
@@ -673,16 +671,15 @@ public class SpikeBoxViewModel : ReactiveObject, IScreen
 
     public async Task DisplayView()
     {
-        if (SpikeViewModel is ICustomPageViewModel modelBase)
+        if (ConfigEditViewModel is not null)
         {
-            modelBase.SetCustomPageValue(Inputs.GetNameValues());
-            modelBase.SetScreen(this);
-            await Router.Navigate.Execute(modelBase);
+            await DisplayView(ConfigEditViewModel.GetNameValues());
         }
     }
 
     public async Task DisplayView(List<NameValue> data)
     {
+        Inputs = data;
         if (SpikeViewModel is ICustomPageViewModel modelBase)
         {
             modelBase.SetCustomPageValue(data);

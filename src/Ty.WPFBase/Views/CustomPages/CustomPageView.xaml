@@ -106,7 +106,7 @@
                                             <rxui:RoutedViewHost.DefaultContent>
                                                 <ScrollViewer>
                                                     <StackPanel>
-                                                        <configs:ConfigEditView DataContext="{Binding Inputs}"></configs:ConfigEditView>
+                                                        <configs:ConfigEditView DataContext="{Binding ConfigEditViewModel}"></configs:ConfigEditView>
                                                         <Button Content="确定" Command="{Binding DisplayViewCommand}"></Button>
                                                     </StackPanel>
 
