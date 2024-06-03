@@ -19,6 +19,7 @@ namespace Test1.WPF
             builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
             builder.Services.AddTransientView<ConfigTestViewModel, ConfigTestView>();
+            builder.Services.AddSingletonCustomPageView<CustomPage1ViewModel, CustomPage1View>();
 
             builder.Services.Configure<PageOptions>(options =>
             {

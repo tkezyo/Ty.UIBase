@@ -22,6 +22,7 @@
 		<None Remove="appsettings.json" />
 		<None Remove="appsettings.secrets.json" />
 		<None Remove="Views\ConfigTestView.xaml" />
+		<None Remove="Views\CustomPage1View.xaml" />
 		<Content Include="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
@@ -33,6 +34,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\Ty.WPFBase\Ty.WPFBase.csproj" />
+		<ProjectReference OutputItemType="Analyzer" ReferenceOutputAssembly="false" Include="..\..\tools\Ty.SourceGenerator\Ty.SourceGenerator.csproj" />
 	</ItemGroup>
 
 </Project>

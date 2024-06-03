@@ -34,6 +34,15 @@ namespace Ty
         /// 包含所有的步骤及转换器
         /// </summary>
         public Dictionary<string, List<CustomViewDefinition>> Group { get; set; } = [];
+        public List<CustomViewDefinition> GetOrAddGroup(string category)
+        {
+            if (!Group.TryGetValue(category, out var group))
+            {
+                group = [];
+                Group.Add(category, group);
+            }
+            return group;
+        }
     }
     public class CustomViewDefinition
     {

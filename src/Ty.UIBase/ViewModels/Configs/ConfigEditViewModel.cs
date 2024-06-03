@@ -5,7 +5,6 @@ using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 using System.Collections.ObjectModel;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
@@ -56,6 +55,16 @@ public class ConfigEditViewModel : ReactiveValidationObject
             result[item2.Name] = SetJsonNode(item2);
         }
         return result;
+    }
+
+    public List<NameValue> GetNameValues()
+    {
+        List<NameValue> nameValues = [];
+        foreach (var item2 in Configs)
+        {
+            nameValues.Add(new NameValue(item2.Name, SetJsonNode(item2).ToString()));
+        }
+        return nameValues;
     }
 
     /// <summary>
@@ -253,7 +262,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
         {
             if (propertyModel.Type == ConfigModelType.Object && config[propertyModel.Name] is JsonObject jsonObj)
             {
-                var properties = _configManager.GetConfigModel(propertyModel.SubTypeName);
+                var properties = ConfigManager.GetConfigModel(propertyModel.SubTypeName);
                 if (properties is not null)
                 {
                     configViewModelProperty.Value = "create";
@@ -341,7 +350,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
 
                         if (propertyModel.SubType == ConfigModelType.Object)
                         {
-                            var properties = _configManager.GetConfigModel(propertyModel.SubTypeName);
+                            var properties = ConfigManager.GetConfigModel(propertyModel.SubTypeName);
                             if (properties is not null)
                             {
                                 subConfigViewModel.Value = "create";
@@ -467,7 +476,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
 
             if (configViewModel.SubType == ConfigModelType.Object)
             {
-                var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+                var properties = ConfigManager.GetConfigModel(configViewModel.SubTypeName);
                 if (properties is null)
                 {
                     return;
@@ -487,7 +496,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
     public ReactiveCommand<ConfigViewModel, Unit> SetObjectCommand { get; }
     public void SetObject(ConfigViewModel configViewModel)
     {
-        var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+        var properties = ConfigManager.GetConfigModel(configViewModel.SubTypeName);
         if (properties is null)
         {
             return;
@@ -511,7 +520,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
             configViewModel1.SetValidationRule();
             if (configViewModel.SubType == ConfigModelType.Object)
             {
-                var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+                var properties = ConfigManager.GetConfigModel(configViewModel.SubTypeName);
                 if (properties is null)
                 {
                     return;
@@ -570,7 +579,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
             //如果是对象，需要转换为JsonObject,然后递归设置
             var jsonObj = JsonSerializer.Deserialize<JsonObject>(json);
 
-            var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+            var properties = ConfigManager.GetConfigModel(configViewModel.SubTypeName);
             if (properties is null)
             {
                 return;
@@ -660,7 +669,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
 
                     if (configViewModel.SubType == ConfigModelType.Object)
                     {
-                        var properties = _configManager.GetConfigModel(configViewModel.SubTypeName);
+                        var properties = ConfigManager.GetConfigModel(configViewModel.SubTypeName);
                         if (properties is not null)
                         {
                             subConfigViewModel.Value = "create";

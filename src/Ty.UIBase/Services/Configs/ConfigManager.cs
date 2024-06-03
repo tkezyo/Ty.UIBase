@@ -9,13 +9,13 @@ namespace Ty.Services.Configs
 {
     public class ConfigManager
     {
-        private Dictionary<string, List<PropertyModel>> ConfigModels { get; set; } = [];
+        private static Dictionary<string, List<PropertyModel>> ConfigModels { get; set; } = [];
 
         public void SetConfigModels(string name, List<PropertyModel> configModels)
         {
             ConfigModels[name] = configModels;
         }
-        public List<PropertyModel>? GetConfigModel(string typeName)
+        public static List<PropertyModel>? GetConfigModel(string typeName)
         {
             if (ConfigModels.TryGetValue(typeName, out var list))
             {
@@ -23,7 +23,7 @@ namespace Ty.Services.Configs
             }
             return null;
         }
-        public List<PropertyModel> GetConfigModel(Type type)
+        public static List<PropertyModel> GetConfigModel(Type type, Func<object[]?, bool>? filter = null)
         {
             if (ConfigModels.TryGetValue(type.FullName!, out var list))
             {
@@ -34,9 +34,18 @@ namespace Ty.Services.Configs
             List<PropertyModel> subTypeProperties = [];
             foreach (var item in properties)
             {
-                subTypeProperties.Add(CreateProperty(item.Name, item.PropertyType, item.GetCustomAttributes(true)));
+                var attrs = item.GetCustomAttributes(true);
+                if (filter != null && !filter(attrs))
+                {
+                    continue;
+                }
+                var prop = CreateProperty(item.Name, item.PropertyType, attrs);
+                subTypeProperties.Add(prop);
             }
-            ConfigModels.TryAdd(type.FullName!, subTypeProperties);
+            if (type.IsClass)
+            {
+                ConfigModels.TryAdd(type.FullName!, subTypeProperties);
+            }
 
             return subTypeProperties;
         }
@@ -46,13 +55,13 @@ namespace Ty.Services.Configs
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public List<PropertyModel> GetConfigModel<T>()
+        public static List<PropertyModel> GetConfigModel<T>(Func<object[]?, bool>? filter = null)
             where T : class
         {
-            return GetConfigModel(typeof(T));
+            return GetConfigModel(typeof(T), filter);
         }
 
-        private PropertyModel CreateProperty(string name, Type type, object[]? attributes = null)
+        private static PropertyModel CreateProperty(string name, Type type, object[]? attributes = null)
         {
             var configModel = new PropertyModel(name);
             SetLength(type);

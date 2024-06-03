@@ -24,7 +24,7 @@ public class ConfigTestViewModel : ViewModelBase
 
     public override Task Activate()
     {
-        var models = _configManager.GetConfigModel<DemoConfig>();
+        var models = ConfigManager.GetConfigModel<DemoConfig>();
         Config.LoadConfig(models, null);
         return base.Activate();
     }

@@ -1,4 +1,7 @@
-﻿namespace Ty.ViewModels.CustomPages
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace Ty.ViewModels.CustomPages
 {
     public interface ICustomPageViewModel : ICustomPageInjectViewModel, ITyRoutableViewModel
     {
@@ -13,6 +16,25 @@
         static abstract CustomViewDefinition GetDefinition();
         Task WrapAsync(List<NameValue> inputs, CancellationToken cancellationToken);
         Task Load();
+
+        public static T? GetValue<T>(string name, List<NameValue> inputs)
+        {
+            var input = inputs.FirstOrDefault(c => c.Name == name);
+            if (input is null)
+            {
+                return default;
+            }
+            if (typeof(T).FullName == "String")
+            {
+                //确保首尾都是"
+                if (input.Value.StartsWith("\"") && input.Value.EndsWith("\""))
+                {
+                    return JsonSerializer.Deserialize<T>(input.Value);
+                }
+                return JsonSerializer.Deserialize<T>($"\"{input.Value}\"");
+            }
+            return JsonSerializer.Deserialize<T>(input.Value);
+        }
     }
     public interface ICustomPageInjectViewModel
     {

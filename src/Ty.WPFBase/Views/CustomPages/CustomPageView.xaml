@@ -11,7 +11,7 @@
                           d:DataContext="{d:DesignInstance Type=vms:CustomPageViewModel}"
                             xmlns:s="clr-namespace:System;assembly=mscorlib"
                           xmlns:converters="clr-namespace:Ty.Converters"
-  xmlns:app="clr-namespace:Ty"
+  xmlns:app="clr-namespace:Ty" xmlns:configs="clr-namespace:Ty.Views.Configs"
                           x:Name="page"
                           mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -102,12 +102,12 @@
                                         </Button>
                                     </GroupBox.Header>
                                     <Grid>
-                                        <rxui:RoutedViewHost 
-                                      Router="{Binding Router}"  >
+                                        <rxui:RoutedViewHost Router="{Binding Router}"  >
                                             <rxui:RoutedViewHost.DefaultContent>
                                                 <ScrollViewer>
                                                     <StackPanel>
-                                                        <ComboBox ItemsSource="{Binding DataContext.CustomGroups,ElementName=page}" SelectedItem="{Binding ViewCategory}" hc:TitleElement.Title="类别" Style="{StaticResource ComboBoxExtend}"/>
+                                                        <configs:ConfigEditView DataContext="{Binding Inputs}"></configs:ConfigEditView>
+                                                        <Button Content="确定" Command="{Binding DisplayViewCommand}"></Button>
                                                     </StackPanel>
 
                                                 </ScrollViewer>

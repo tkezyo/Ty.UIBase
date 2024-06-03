@@ -110,6 +110,7 @@ namespace Ty.ViewModels
             Show = menuInfo.Show;
             Color = menuInfo.Color;
             ViewModel = menuInfo.ViewModel;
+            GroupName = menuInfo.GroupName;
             MenuExecuteCommand = ReactiveCommand.CreateFromTask(reactiveCommand);
 
 
@@ -128,6 +129,11 @@ namespace Ty.ViewModels
         /// </summary>
         [Reactive]
         public string Name { get; set; }
+        /// <summary>
+        /// 名称
+        /// </summary>
+        [Reactive]
+        public string GroupName { get; set; }
 
         [Reactive]
         public string FullName { get; set; }
