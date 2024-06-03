@@ -12,5 +12,6 @@ $projects = (
     "src/Ty.Module",
     "src/Ty.UIBase",
     "src/Ty.WPFBase",
-    "src/Ty.AvaloniaBase"
+    "src/Ty.AvaloniaBase",
+    "tools/Ty.SourceGenerator"
 )
