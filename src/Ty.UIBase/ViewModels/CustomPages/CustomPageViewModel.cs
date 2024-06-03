@@ -381,18 +381,25 @@ public class CustomPageViewModel : ViewModelBase
                 {
                     Name = box.Name,
                     ViewName = box.ViewName,
-                    ViewCategory = box.ViewGroup,
+                    ViewCategory = box.ViewCategory,
                     Size = new SpikeBoxResizableViewModel() { Height = box.Size.Height, Width = box.Size.Width, Left = box.Size.Left, Top = box.Size.Top },
                 };
-                //boxViewModel.Inputs = _serviceProvider.GetRequiredService<ConfigEditViewModel>();
 
-                //boxViewModel.Inputs.LoadConfig(_customPageOption.Group[box.ViewGroup].First(c => c.Name == box.ViewName).Data, box.Inputs);
-                //var vm = _serviceProvider.GetKeyedService<ICustomPageInjectViewModel>(boxViewModel.ViewCategory + ":" + boxViewModel.ViewName);
-                //if (vm is ICustomPageViewModel sVm)
-                //{
-                //    await sVm.WrapAsync(box.Inputs.Select(c => new NameValue(c.Key, c.Value?.ToString() ?? string.Empty)).ToList(), CancellationToken.None);
-                //    boxViewModel.DisplayView(sVm);
-                //}
+                var vm = _serviceProvider.GetKeyedService<ICustomPageInjectViewModel>(box.ViewCategory + ":" + box.ViewName);
+
+                if (vm is ICustomPageViewModel sVm)
+                {
+                    var configEditVM = _serviceProvider.GetRequiredService<ConfigEditViewModel>();
+                    var vinfo = _customPageOption.Group[box.ViewCategory].FirstOrDefault(c => c.Name == box.ViewName);
+                    if (vinfo is not null)
+                    {
+                        configEditVM.LoadConfig(vinfo.Data, null);
+                        boxViewModel.SpikeViewModel = sVm;
+
+                        await boxViewModel.DisplayView(box.Inputs);
+                    }
+                }
+
                 spikeTabViewModel.Boxes.Add(boxViewModel);
             }
 
@@ -416,15 +423,20 @@ public class CustomPageViewModel : ViewModelBase
         foreach (var item in Tabs)
         {
 
-            SpikeTab spikeTab = new SpikeTab() { Name = item.Name };
+            SpikeTab spikeTab = new() { Name = item.Name };
             foreach (var box in item.Boxes)
             {
-                SpikeBox spikeBox = new SpikeBox()
+                if (box.Router.NavigationStack.Count == 0)
+                {
+                    continue;
+                }
+
+                SpikeBox spikeBox = new()
                 {
                     Name = box.Name,
                     ViewName = box.ViewName,
-                    ViewGroup = box.ViewCategory,
-                    Inputs = box.Inputs?.GetResult(),
+                    ViewCategory = box.ViewCategory,
+                    Inputs = box.Inputs?.GetNameValues(),
                     Size = new SpikeMoveAndResizable() { Height = box.Size.Height, Width = box.Size.Width, Left = box.Size.Left, Top = box.Size.Top }
                 };
                 spikeTab.Boxes.Add(spikeBox);
@@ -616,9 +628,9 @@ public class SpikeBox
 {
     public required string Name { get; set; }
 
-    public string? ViewGroup { get; set; }
+    public string? ViewCategory { get; set; }
     public string? ViewName { get; set; }
-    public JsonObject? Inputs { get; set; }
+    public List<NameValue> Inputs { get; set; } = [];
 
     public SpikeMoveAndResizable Size { get; set; } = new SpikeMoveAndResizable();
 }
@@ -663,7 +675,17 @@ public class SpikeBoxViewModel : ReactiveObject, IScreen
     {
         if (SpikeViewModel is ICustomPageViewModel modelBase)
         {
-            await modelBase.WrapAsync(Inputs.GetNameValues(), default);
+            modelBase.SetCustomPageValue(Inputs.GetNameValues());
+            modelBase.SetScreen(this);
+            await Router.Navigate.Execute(modelBase);
+        }
+    }
+
+    public async Task DisplayView(List<NameValue> data)
+    {
+        if (SpikeViewModel is ICustomPageViewModel modelBase)
+        {
+            modelBase.SetCustomPageValue(data);
             modelBase.SetScreen(this);
             await Router.Navigate.Execute(modelBase);
         }

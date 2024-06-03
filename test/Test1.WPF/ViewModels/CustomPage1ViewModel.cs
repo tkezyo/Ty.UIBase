@@ -14,11 +14,5 @@ namespace Test1.WPF.ViewModels
         [Reactive]
         public int Number { get; set; }
 
-        public async Task Load()
-        {
-            await Task.CompletedTask;
-        }
-
-
     }
 }

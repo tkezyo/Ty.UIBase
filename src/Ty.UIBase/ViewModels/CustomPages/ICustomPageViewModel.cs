@@ -14,8 +14,7 @@ namespace Ty.ViewModels.CustomPages
         /// </summary>
         static abstract string Name { get; }
         static abstract CustomViewDefinition GetDefinition();
-        Task WrapAsync(List<NameValue> inputs, CancellationToken cancellationToken);
-        Task Load();
+        void SetCustomPageValue(List<NameValue> inputs);
 
         public static T? GetValue<T>(string name, List<NameValue> inputs)
         {

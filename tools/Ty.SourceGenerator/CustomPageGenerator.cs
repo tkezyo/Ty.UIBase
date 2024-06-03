@@ -111,10 +111,9 @@ namespace {item.Option.ContainingNamespace};
 
 public partial class {item.Option.MetadataName}
 {{
-    public async Task WrapAsync(List<NameValue> inputs, CancellationToken cancellationToken)
+    public void SetCustomPageValue(List<NameValue> inputs)
     {{
 {inputStringBuilder}
-        await Load();
     }}
 
     public static CustomViewDefinition GetDefinition()
