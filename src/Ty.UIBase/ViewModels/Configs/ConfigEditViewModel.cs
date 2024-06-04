@@ -1,4 +1,5 @@
 ﻿using DynamicData.Binding;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Extensions;
@@ -9,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using TextCopy;
+using Ty.Module.Configs;
 using Ty.Services.Configs;
 
 namespace Ty.ViewModels.Configs;
@@ -16,8 +18,9 @@ namespace Ty.ViewModels.Configs;
 public class ConfigEditViewModel : ReactiveValidationObject
 {
     private readonly ConfigManager _configManager;
+    private readonly IServiceProvider _serviceProvider;
 
-    public ConfigEditViewModel(ConfigManager configManager)
+    public ConfigEditViewModel(ConfigManager configManager, IServiceProvider serviceProvider)
     {
         AddPropertyCommand = ReactiveCommand.Create<ConfigViewModel>(AddProperty);
         AddArrayCommand = ReactiveCommand.Create<ConfigViewModel>(AddArray);
@@ -33,6 +36,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
             this.ValidationContext.Remove(c.ValidationContext);
         });
         this._configManager = configManager;
+        this._serviceProvider = serviceProvider;
     }
 
 
@@ -228,7 +232,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
     /// <param name="propertyModel"></param>
     /// <param name="config"></param>
     /// <param name="configViewModel"></param>
-    void SetConfigViewModel(PropertyModel propertyModel, JsonObject? config, ObservableCollection<ConfigViewModel> configViewModel)
+    async void SetConfigViewModel(PropertyModel propertyModel, JsonObject? config, ObservableCollection<ConfigViewModel> configViewModel)
     {
         var configViewModelProperty = new ConfigViewModel(propertyModel.Name)
         {
@@ -243,7 +247,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
             Maximum = propertyModel.Maximum ?? double.NaN,
             AllowedValues = propertyModel.AllowedValues is not null ? new ObservableCollection<string>(propertyModel.AllowedValues) : null,
             DeniedValues = propertyModel.DeniedValues is not null ? new ObservableCollection<string>(propertyModel.DeniedValues) : null,
-            Options = new ObservableCollection<KeyValuePair<string, string>>(propertyModel.Options ?? []),
+            Options = new ObservableCollection<NameValue>(propertyModel.Options ?? []),
             Required = propertyModel.Required ?? false,
             RegularExpression = propertyModel.RegularExpression,
             Dim = propertyModel.Dim,
@@ -255,6 +259,19 @@ public class ConfigEditViewModel : ReactiveValidationObject
             RangeErrorMessage = propertyModel.RangeErrorMessage,
             LengthErrorMessage = propertyModel.LengthErrorMessage,
         };
+
+        if (!string.IsNullOrEmpty(propertyModel.OptionProvider))
+        {
+            var opi = _serviceProvider.GetRequiredKeyedService<IOptionProviderInject>(propertyModel.OptionProvider);
+            if (opi is IOptionProvider provider)
+            {
+                configViewModelProperty.Options.Clear();
+                await foreach (var item in opi.GetOptions())
+                {
+                    configViewModelProperty.Options.Add(item);
+                }
+            }
+        }
 
         configViewModelProperty.SetValidationRule();
 
@@ -295,7 +312,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
                                 Maximum = propertyModel.Maximum ?? double.NaN,
                                 AllowedValues = propertyModel.AllowedValues is not null ? new ObservableCollection<string>(propertyModel.AllowedValues) : null,
                                 DeniedValues = propertyModel.DeniedValues is not null ? new ObservableCollection<string>(propertyModel.DeniedValues) : null,
-                                Options = new ObservableCollection<KeyValuePair<string, string>>(propertyModel.Options ?? []),
+                                Options = new ObservableCollection<NameValue>(propertyModel.Options ?? []),
                                 Required = propertyModel.Required ?? false,
                                 RegularExpression = propertyModel.RegularExpression,
                                 AllowedValuesErrorMessage = propertyModel.AllowedValuesErrorMessage,
@@ -335,7 +352,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
                             Maximum = propertyModel.Maximum ?? double.NaN,
                             AllowedValues = propertyModel.AllowedValues is not null ? new ObservableCollection<string>(propertyModel.AllowedValues) : null,
                             DeniedValues = propertyModel.DeniedValues is not null ? new ObservableCollection<string>(propertyModel.DeniedValues) : null,
-                            Options = new ObservableCollection<KeyValuePair<string, string>>(propertyModel.Options ?? []),
+                            Options = new ObservableCollection<NameValue>(propertyModel.Options ?? []),
                             Required = propertyModel.Required ?? false,
                             RegularExpression = propertyModel.RegularExpression,
                             AllowedValuesErrorMessage = propertyModel.AllowedValuesErrorMessage,
@@ -614,7 +631,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
                             Maximum = configViewModel.Maximum,
                             AllowedValues = configViewModel.AllowedValues is not null ? new ObservableCollection<string>(configViewModel.AllowedValues) : null,
                             DeniedValues = configViewModel.DeniedValues is not null ? new ObservableCollection<string>(configViewModel.DeniedValues) : null,
-                            Options = new ObservableCollection<KeyValuePair<string, string>>(configViewModel.Options ?? []),
+                            Options = new ObservableCollection<NameValue>(configViewModel.Options ?? []),
                             Required = configViewModel.Required,
                             RegularExpression = configViewModel.RegularExpression,
                             AllowedValuesErrorMessage = configViewModel.AllowedValuesErrorMessage,
@@ -654,7 +671,7 @@ public class ConfigEditViewModel : ReactiveValidationObject
                         Maximum = configViewModel.Maximum,
                         AllowedValues = configViewModel.AllowedValues is not null ? new ObservableCollection<string>(configViewModel.AllowedValues) : null,
                         DeniedValues = configViewModel.DeniedValues is not null ? new ObservableCollection<string>(configViewModel.DeniedValues) : null,
-                        Options = new ObservableCollection<KeyValuePair<string, string>>(configViewModel.Options ?? []),
+                        Options = new ObservableCollection<NameValue>(configViewModel.Options ?? []),
                         Required = configViewModel.Required,
                         RegularExpression = configViewModel.RegularExpression,
                         AllowedValuesErrorMessage = configViewModel.AllowedValuesErrorMessage,
@@ -973,7 +990,7 @@ public class ConfigViewModel : ReactiveValidationObject
     [Reactive]
     public ObservableCollection<string>? DeniedValues { get; set; }
     [Reactive]
-    public ObservableCollection<KeyValuePair<string, string>>? Options { get; set; }
+    public ObservableCollection<NameValue>? Options { get; set; }
     [Reactive]
     public bool Required { get; set; }
     [Reactive]

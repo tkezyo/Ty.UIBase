@@ -97,7 +97,7 @@ namespace Ty.Services.Configs
             {
                 configModel.Type = ConfigModelType.Number;
                 // 显示内容为枚举的名称，值为枚举的值
-                configModel.Options = type.GetEnumNames().Select(c => new KeyValuePair<string, string>(c, ((int)Enum.Parse(type, c)).ToString())).ToList();
+                configModel.Options = type.GetEnumNames().Select(c => new NameValue(c, ((int)Enum.Parse(type, c)).ToString())).ToList();
             }
             //如果是Array 或者是List
             else if (type.IsArray || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
@@ -358,7 +358,7 @@ namespace Ty.Services.Configs
                 if (attribute is OptionAttribute optionAttribute)
                 {
                     configModel.Options ??= [];
-                    configModel.Options.Add(new KeyValuePair<string, string>(optionAttribute.DisplayName, optionAttribute.Value));
+                    configModel.Options.Add(new NameValue(optionAttribute.DisplayName, optionAttribute.Value));
                 }
                 if (attribute is OptionProviderAttribute optionProviderAttribute)
                 {

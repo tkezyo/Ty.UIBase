@@ -133,7 +133,7 @@
                     <Button Content="复制" Command="{Binding CopyCommand,ElementName=page}" CommandParameter="{Binding .}" Style="{StaticResource ButtonCustom}" Visibility="{Binding Tag, RelativeSource={RelativeSource AncestorType=StackPanel}}"/>
                     <Button Content="粘贴" Command="{Binding PasteCommand,ElementName=page}" CommandParameter="{Binding .}" Style="{StaticResource ButtonCustom}" Visibility="{Binding Tag, RelativeSource={RelativeSource AncestorType=StackPanel}}"/>
                 </StackPanel>
-                <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding Value,UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Value" DisplayMemberPath="Key" x:Name="cb" Style="{StaticResource ComboBoxExtend}" hc:InfoElement.Placeholder="{Binding Prompt}"/>
+                <ComboBox ItemsSource="{Binding Options}" SelectedValue="{Binding Value,UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Value" DisplayMemberPath="Name" x:Name="cb" Style="{StaticResource ComboBoxExtend}" hc:InfoElement.Placeholder="{Binding Prompt}" Validation.ErrorTemplate="{x:Null}"/>
                 <ItemsControl ItemsSource="{Binding (Validation.Errors),ElementName=cb}" Visibility="{Binding (Validation.HasError), ElementName=cb, Converter={StaticResource Boolean2VisibilityConverter}}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>

@@ -2,9 +2,11 @@
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using System.Drawing;
+using Test1.WPF.Models;
 using Test1.WPF.ViewModels;
 using Test1.WPF.Views;
 using Ty;
+using Ty.Module.Configs;
 using Ty.ViewModels;
 using Ty.Views;
 
@@ -20,6 +22,8 @@ namespace Test1.WPF
 
             builder.Services.AddTransientView<ConfigTestViewModel, ConfigTestView>();
             builder.Services.AddTransientCustomPageView<CustomPage1ViewModel, CustomPage1View>();
+
+            builder.Services.AddConfigOptionProvider<StringProvider>();
 
             builder.Services.Configure<PageOptions>(options =>
             {

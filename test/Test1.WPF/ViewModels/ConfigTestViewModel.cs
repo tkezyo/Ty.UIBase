@@ -1,6 +1,7 @@
 ﻿using ReactiveUI;
 using System.Reactive;
 using System.Reactive.Linq;
+using Test1.WPF.Models;
 using Ty.Services;
 using Ty.Services.Configs;
 using Ty.ViewModels;

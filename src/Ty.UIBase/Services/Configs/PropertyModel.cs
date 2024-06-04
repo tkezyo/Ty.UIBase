@@ -32,7 +32,7 @@ public class PropertyModel(string name)
     public string? RangeErrorMessage { get; set; }
 
     public string? OptionProvider { get; set; }
-    public List<KeyValuePair<string, string>>? Options { get; set; }
+    public List<NameValue>? Options { get; set; }
 
     public List<string> SubTypeNames { get; set; } = [];
 }

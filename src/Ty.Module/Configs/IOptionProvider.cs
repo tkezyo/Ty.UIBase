@@ -16,7 +16,7 @@ namespace Ty.Module.Configs
     }
     public interface IOptionProviderInject
     {
-        Task<IEnumerable<NameValue>> GetOptions();
+        IAsyncEnumerable<NameValue> GetOptions();
     }
 
     public class ConfigOption
@@ -42,6 +42,7 @@ namespace Ty.Module.Configs
         public static void AddConfigOptionProvider<T>(this IServiceCollection serviceDescriptors)
        where T : class, IOptionProvider
         {
+            var f = T.Type + ":" + T.Name;
             serviceDescriptors.AddKeyedTransient<IOptionProviderInject, T>(T.Type + ":" + T.Name);
             serviceDescriptors.Configure<ConfigOption>(c =>
             {

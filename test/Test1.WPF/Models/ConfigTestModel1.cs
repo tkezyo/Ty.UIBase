@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Ty.Module.Configs;
 
-namespace Test1.WPF.ViewModels
+namespace Test1.WPF.Models
 {
     public class DemoConfig
     {
+        [OptionProvider(StringProvider.FullName)]
         [AllowedValues("123", "456")]
         [Required]
         [Length(1, 10)]
