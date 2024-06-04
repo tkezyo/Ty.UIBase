@@ -9,9 +9,11 @@
              xmlns:local="clr-namespace:Test1.WPF.Views" xmlns:configs="clr-namespace:Ty.Views.Configs;assembly=Ty.WPFBase" d:DataContext="{d:DesignInstance Type=vms:ConfigTestViewModel}"
                           mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Orientation="Vertical">
-        <Button Content="检查" Command="{Binding ShowResultCommand}"/>
-        <configs:ConfigEditView DataContext="{Binding Config}"></configs:ConfigEditView>
-        <ComboBox Style="{StaticResource ComboBoxExtend}"/>
-    </StackPanel>
+    <ScrollViewer>
+
+        <StackPanel Orientation="Vertical">
+            <Button Content="检查" Command="{Binding ShowResultCommand}"/>
+            <configs:ConfigEditView DataContext="{Binding Config}"></configs:ConfigEditView>
+        </StackPanel>
+    </ScrollViewer>
 </rxui:ReactiveUserControl>
