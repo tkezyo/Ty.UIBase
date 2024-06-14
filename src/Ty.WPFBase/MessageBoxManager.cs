@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using HandyControl.Controls;
+using HandyControl.Data;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using ReactiveUI;
 using System;
@@ -40,6 +42,9 @@ namespace Ty
         public Interaction<OpenFilesInfo, string[]?> OpenFiles { get; }
         public Interaction<PromptInfo, PromptResult> Prompt { get; }
         public Interaction<string, string?> SelectFolder { get; }
+
+        public Interaction<NotifyInfo, Unit> Notify { get; }
+
         public MessageBoxManager()
         {
             Conform = new Interaction<ConformInfo, bool>();
@@ -50,6 +55,7 @@ namespace Ty
             OpenFiles = new Interaction<OpenFilesInfo, string[]?>();
             Prompt = new Interaction<PromptInfo, PromptResult>();
             SelectFolder = new Interaction<string, string?>();
+            Notify = new Interaction<NotifyInfo, Unit>();
 
             Alert.RegisterHandler(DoAlertAsync);
             Modals.RegisterHandler(DoShowDialogAsync);
@@ -59,7 +65,49 @@ namespace Ty
             Conform.RegisterHandler(ConformDialogAsync);
             Prompt.RegisterHandler(PromptDialogAsync);
             SelectFolder.RegisterHandler(FileFolderAsync);
+            Notify.RegisterHandler(NotifyAsync);
         }
+
+        protected virtual async Task NotifyAsync(IInteractionContext<NotifyInfo, Unit> interaction)
+        {
+            GrowlInfo growlInfo = new()
+            {
+                Message = interaction.Input.Message,
+                ShowDateTime = false,
+                IsCustom = true,
+                WaitTime = (int)interaction.Input.Expiration.TotalSeconds,
+                Type = interaction.Input.Level switch
+                {
+                    NotifyLevel.Success => InfoType.Success,
+                    NotifyLevel.Info => InfoType.Info,
+                    NotifyLevel.Warning => InfoType.Warning,
+                    NotifyLevel.Error => InfoType.Error,
+                    _ => InfoType.Info
+                },
+            };
+
+            switch (interaction.Input.Level)
+            {
+                case NotifyLevel.Success:
+                    Growl.SuccessGlobal(growlInfo);
+                    break;
+                case NotifyLevel.Info:
+                    Growl.InfoGlobal(growlInfo);
+                    break;
+                case NotifyLevel.Warning:
+                    Growl.WarningGlobal(growlInfo);
+                    break;
+                case NotifyLevel.Error:
+                    Growl.ErrorGlobal(growlInfo);
+                    break;
+                default:
+                    break;
+            }
+
+            interaction.SetOutput(Unit.Default);
+            await Task.CompletedTask;
+        }
+
         protected virtual async Task FileFolderAsync(IInteractionContext<string,
                                      string?> interaction)
         {
@@ -77,19 +125,16 @@ namespace Ty
             interaction.SetOutput(null);
             await Task.CompletedTask;
         }
-        protected virtual void ConformDialogAsync(IInteractionContext<ConformInfo,
-                                    bool> interaction)
+        protected virtual void ConformDialogAsync(IInteractionContext<ConformInfo, bool> interaction)
         {
-
             var window = GetCurrentWindow(interaction.Input.OwnerTitle);
 
-            var rr = MessageBox.Show(window, interaction.Input.Message, interaction.Input.Title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var rr = HandyControl.Controls.MessageBox.Show(interaction.Input.Message, interaction.Input.Title, MessageBoxButton.YesNo, MessageBoxImage.Question);
             interaction.SetOutput(rr == MessageBoxResult.Yes);
             return;
 
         }
-        protected virtual async Task PromptDialogAsync(IInteractionContext<PromptInfo,
-                                    PromptResult> interaction)
+        protected virtual async Task PromptDialogAsync(IInteractionContext<PromptInfo, PromptResult> interaction)
         {
             var dialog = TyApp.ServiceProvider.GetRequiredKeyedService<IViewFor>(typeof(PromptDialogViewModel).FullName);
             var viewModel = TyApp.ServiceProvider.GetRequiredService<PromptDialogViewModel>();
@@ -99,7 +144,7 @@ namespace Ty
             dialog.ViewModel = viewModel;
             IDisposable? disposable = null;
             TaskCompletionSource<PromptResult> tcs = new();
-            if (dialog is Window window)
+            if (dialog is System.Windows.Window window)
             {
                 window.DataContext = viewModel;
                 var o = Observable.FromEventPattern<EventHandler, EventArgs>(c => window.Closed += c, c => window.Closed -= c).Select(c => false);
@@ -122,8 +167,7 @@ namespace Ty
             interaction.SetOutput(r);
             return;
         }
-        protected virtual void FileDialogAsync(IInteractionContext<OpenFilesInfo,
-                                            string[]?> interaction)
+        protected virtual void FileDialogAsync(IInteractionContext<OpenFilesInfo, string[]?> interaction)
         {
             var dlg = new OpenFileDialog
             {
@@ -136,8 +180,7 @@ namespace Ty
             interaction.SetOutput(dlg.FileNames);
             return;
         }
-        protected virtual void SaveFileAsync(IInteractionContext<SaveFilesInfo,
-                                       string?> interaction)
+        protected virtual void SaveFileAsync(IInteractionContext<SaveFilesInfo, string?> interaction)
         {
             var dlg = new SaveFileDialog
             {
@@ -153,8 +196,7 @@ namespace Ty
             interaction.SetOutput(dlg.FileName);
             return;
         }
-        protected virtual async Task DoShowDialogAsync(IInteractionContext<ModalInfo,
-                                            bool> interaction)
+        protected virtual async Task DoShowDialogAsync(IInteractionContext<ModalInfo, bool> interaction)
         {
             var dialog = TyApp.ServiceProvider.GetRequiredKeyedService<IViewFor>(typeof(ModalDialogViewModel).FullName);
             var viewModel = TyApp.ServiceProvider.GetRequiredService<ModalDialogViewModel>();
@@ -166,7 +208,7 @@ namespace Ty
             dialog.ViewModel = viewModel;
             IDisposable? disposable = null;
             TaskCompletionSource<bool> tcs = new();
-            if (dialog is Window window)
+            if (dialog is System.Windows.Window window)
             {
                 window.DataContext = viewModel;
                 window.Height = viewModel.Height;
@@ -198,9 +240,9 @@ namespace Ty
                 var old = FindWindow(interaction.Input.Title);
                 if (old is not null)
                 {
-                    if (old.WindowState == WindowState.Minimized)
+                    if (old.WindowState == System.Windows.WindowState.Minimized)
                     {
-                        old.WindowState = WindowState.Normal;
+                        old.WindowState = System.Windows.WindowState.Normal;
                     }
                     old.Focus();
                     interaction.SetOutput(true);
@@ -217,7 +259,7 @@ namespace Ty
             viewModel.ModalViewModel = interaction.Input.ViewModel;
             dialog.ViewModel = viewModel;
             TaskCompletionSource<bool> tcs = new();
-            if (dialog is Window window)
+            if (dialog is System.Windows.Window window)
             {
                 window.DataContext = viewModel;
                 window.Height = viewModel.Height;
@@ -231,12 +273,12 @@ namespace Ty
                 if (interaction.Input.OwnerTitle is not null)
                 {
                     var ownerWindow = GetCurrentWindow(interaction.Input.OwnerTitle);
-                    window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                    window.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner;
                     window.Owner = ownerWindow;
                 }
                 else
                 {
-                    window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    window.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
                 }
 
                 window.Show();
@@ -255,22 +297,30 @@ namespace Ty
                                           Unit> interaction)
         {
             var window = GetCurrentWindow(interaction.Input.OwnerTitle);
+            MessageBoxImage messageBoxImage = interaction.Input.Level switch
+            {
+                NotifyLevel.Success => MessageBoxImage.Information,
+                NotifyLevel.Info => MessageBoxImage.Information,
+                NotifyLevel.Warning => MessageBoxImage.Warning,
+                NotifyLevel.Error => MessageBoxImage.Error,
+                _ => MessageBoxImage.Information
+            };
             if (window is not null)
             {
-                MessageBox.Show(window, interaction.Input.Message, interaction.Input.Title ?? "提示");
+                HandyControl.Controls.MessageBox.Show(window, interaction.Input.Message, interaction.Input.Title ?? "提示", icon: messageBoxImage);
                 interaction.SetOutput(Unit.Default);
                 return;
             }
 
 
-            MessageBox.Show(interaction.Input.Message, interaction.Input.Title);
+            HandyControl.Controls.MessageBox.Show(interaction.Input.Message, interaction.Input.Title, icon: messageBoxImage);
             interaction.SetOutput(Unit.Default);
             await Task.CompletedTask;
         }
 
-        private static Window? FindWindow(string? title)
+        private static System.Windows.Window? FindWindow(string? title)
         {
-            foreach (Window item in Application.Current.Windows)
+            foreach (System.Windows.Window item in System.Windows.Application.Current.Windows)
             {
                 if (item.Title == title)
                 {
@@ -280,20 +330,20 @@ namespace Ty
             return null;
         }
 
-        private static Window GetCurrentWindow(string? ownerTitle)
+        private static System.Windows.Window GetCurrentWindow(string? ownerTitle)
         {
-            foreach (Window item in Application.Current.Windows)
+            foreach (System.Windows.Window item in System.Windows.Application.Current.Windows)
             {
                 if (item.Title == ownerTitle)
                 {
                     return item;
                 }
             }
-            return GetLastWindow(Application.Current.MainWindow);
+            return GetLastWindow(System.Windows.Application.Current.MainWindow);
         }
-        private static Window GetLastWindow(Window window)
+        private static System.Windows.Window GetLastWindow(System.Windows.Window window)
         {
-            if (window.OwnedWindows.Count==0)
+            if (window.OwnedWindows.Count == 0)
             {
                 return window;
             }

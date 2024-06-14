@@ -1,16 +1,14 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
-using Avalonia.ReactiveUI;
-using Ty.AvaloniaBase.Views;
-using Ty.Services;
-using Ty.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualBasic;
-using MsBox.Avalonia.Enums;
 using ReactiveUI;
 using System.Reactive;
 using System.Reactive.Linq;
+using Ty.AvaloniaBase.Views;
+using Ty.Services;
+using Ty.ViewModels;
 
 namespace Ty
 {
@@ -43,6 +41,7 @@ namespace Ty
         public Interaction<PromptInfo, PromptResult> Prompt { get; }
 
         public Interaction<string, string?> SelectFolder { get; }
+        public Interaction<NotifyInfo, Unit> Notify { get; }
 
         public MessageBoxManager()
         {
@@ -54,6 +53,7 @@ namespace Ty
             OpenFiles = new Interaction<OpenFilesInfo, string[]?>();
             Prompt = new Interaction<PromptInfo, PromptResult>();
             SelectFolder = new Interaction<string, string?>();
+            Notify = new Interaction<NotifyInfo, Unit>();
 
             Alert.RegisterHandler(DoAlertAsync);
             Modals.RegisterHandler(DoShowDialogAsync);
@@ -63,7 +63,29 @@ namespace Ty
             Conform.RegisterHandler(ConformDialogAsync);
             Prompt.RegisterHandler(PromptDialogAsync);
             SelectFolder.RegisterHandler(FileFolderAsync);
+            Notify.RegisterHandler(NotifyAsync);
         }
+
+        protected virtual async Task NotifyAsync(IInteractionContext<NotifyInfo, Unit> interaction)
+        {
+            var window = GetCurrentWindow(interaction.Input.OwnerTitle);
+            var topLevel = TopLevel.GetTopLevel(window);
+            var _manager = new WindowNotificationManager(topLevel) { MaxItems = 3 };
+
+            NotificationType notificationType = interaction.Input.Level switch
+            {
+                NotifyLevel.Info => NotificationType.Information,
+                NotifyLevel.Warning => NotificationType.Warning,
+                NotifyLevel.Error => NotificationType.Error,
+                _ => NotificationType.Information,
+
+            };
+
+            _manager.Show(new Avalonia.Controls.Notifications.Notification(interaction.Input.Title, interaction.Input.Message, notificationType, interaction.Input.Expiration));
+            await Task.CompletedTask;
+            interaction.SetOutput(Unit.Default);
+        }
+
         protected virtual async Task ConformDialogAsync(IInteractionContext<ConformInfo,
                                   bool> interaction)
         {

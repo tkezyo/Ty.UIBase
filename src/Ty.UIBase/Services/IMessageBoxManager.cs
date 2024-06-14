@@ -7,6 +7,7 @@ namespace Ty.Services
     public interface IMessageBoxManager
     {
         Interaction<AlertInfo, Unit> Alert { get; }
+        Interaction<NotifyInfo, Unit> Notify { get; }
         Interaction<ConformInfo, bool> Conform { get; }
         Interaction<ModalInfo, bool> Modals { get; }
         Interaction<OpenFilesInfo, string[]?> OpenFiles { get; }
@@ -20,6 +21,16 @@ namespace Ty.Services
         public string? OwnerTitle { get; set; }
         public string? Title { get; set; }
         public string Message { get; set; } = message;
+        public NotifyLevel Level { get; set; } = NotifyLevel.Info;
+    }
+    public class NotifyInfo
+    {
+        public string? OwnerTitle { get; set; }
+        public string? Title { get; set; }
+        public string? Message { get; set; }
+        public NotifyLevel Level { get; set; }
+
+        public TimeSpan Expiration { get; set; } = TimeSpan.FromSeconds(5);
     }
     public class ConformInfo(string message)
     {
@@ -45,10 +56,8 @@ namespace Ty.Services
     }
     public class PromptInfo(string title)
     {
-
         public string? OwnerTitle { get; set; }
         public string Title { get; set; } = title;
-
         public string? DefaultValue { get; set; }
     }
     public class PromptResult
@@ -64,5 +73,14 @@ namespace Ty.Services
         public int Width { get; set; } = width;
         public int Height { get; set; } = height;
         public ITyRoutableViewModel ViewModel { get; set; } = viewModel;
+    }
+  
+
+    public enum NotifyLevel
+    {
+        Success,
+        Info,
+        Warning,
+        Error
     }
 }
