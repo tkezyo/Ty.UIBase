@@ -1,19 +1,37 @@
 using Avalonia;
+using Avalonia.Controls.Notifications;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
 using Avalonia.Styling;
 using ReactiveUI;
+using System.Reactive;
+using Ty.Services;
 using Ty.ViewModels;
 
 namespace Ty.AvaloniaBase.Views;
 
 public partial class LayoutView : ReactiveUserControl<LayoutViewModel>
 {
-    public LayoutView()
+    public LayoutView(IMessageBoxManager messageBoxManager)
     {
         InitializeComponent();
-        this.WhenActivated(d => { });
+        this.WhenActivated(d =>
+        {
+        });
+        this._messageBoxManager = messageBoxManager;
     }
+    private readonly IMessageBoxManager _messageBoxManager;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        if (_messageBoxManager is MessageBoxManager messageBoxManager)
+        {
+            messageBoxManager.SetNotifyManager(this);
+        }
+    }
+
     private void ToggleButton_OnIsCheckedChanged(object sender, RoutedEventArgs e)
     {
         var app = Application.Current;

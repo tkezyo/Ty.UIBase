@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Platform.Storage;
@@ -65,13 +66,32 @@ namespace Ty
             SelectFolder.RegisterHandler(FileFolderAsync);
             Notify.RegisterHandler(NotifyAsync);
         }
+        public WindowNotificationManager? Manager { get; set; }
+
+        /// <summary>
+        /// 需要在布局的OnAttachedToVisualTree中调用
+        /// </summary>
+        /// <param name="visual"></param>
+        /// <remarks>
+        ///    private readonly IMessageBoxManager _messageBoxManager;
+        ///    
+        ///    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        ///    {
+        ///        base.OnAttachedToVisualTree(e);
+        ///        if (_messageBoxManager is MessageBoxManager messageBoxManager)
+        ///        {
+        ///            messageBoxManager.SetNotifyManager(this);
+        ///        }
+        ///    }
+        /// </remarks>
+        public void SetNotifyManager(Visual visual)
+        {
+            var topLevel = TopLevel.GetTopLevel(visual);
+            Manager = new WindowNotificationManager(topLevel) { MaxItems = 3 };
+        }
 
         protected virtual async Task NotifyAsync(IInteractionContext<NotifyInfo, Unit> interaction)
         {
-            var window = GetCurrentWindow(interaction.Input.OwnerTitle);
-            var topLevel = TopLevel.GetTopLevel(window);
-            var _manager = new WindowNotificationManager(topLevel) { MaxItems = 3 };
-
             NotificationType notificationType = interaction.Input.Level switch
             {
                 NotifyLevel.Info => NotificationType.Information,
@@ -81,7 +101,7 @@ namespace Ty
 
             };
 
-            _manager.Show(new Avalonia.Controls.Notifications.Notification(interaction.Input.Title, interaction.Input.Message, notificationType, interaction.Input.Expiration));
+            Manager?.Show(new Avalonia.Controls.Notifications.Notification(interaction.Input.Title, interaction.Input.Message, notificationType, interaction.Input.Expiration));
             await Task.CompletedTask;
             interaction.SetOutput(Unit.Default);
         }

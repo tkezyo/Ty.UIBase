@@ -25,14 +25,12 @@ namespace Test1.Avalonia
             //serviceDescriptors.AddTransientCustomPageView<ChatViewModel, ChatView>();
             //serviceDescriptors.AddCustomLogView<CustomLogViewModel, CustomLogView>();
             hostApplicationBuilder.Services.AddSingletonView<TestViewModel, TestView>();
-            hostApplicationBuilder.Services.AddSingletonView<LayoutViewModel, LayoutView>();
 
 
             hostApplicationBuilder.Services.Configure<PageOptions>(options =>
             {
                 options.FirstLoadPage = typeof(LayoutViewModel);
                 options.Title = "测试";
-
             });
 
             hostApplicationBuilder.Services.Configure<MenuOptions>(options =>

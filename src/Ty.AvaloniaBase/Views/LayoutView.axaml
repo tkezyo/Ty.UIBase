@@ -11,11 +11,6 @@
              x:Class="Ty.AvaloniaBase.Views.LayoutView">
 
 	<Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,*">
-		<Menu>
-			<Menu.ItemTemplate>
-				
-			</Menu.ItemTemplate>
-		</Menu>
 		<TextBlock Text="{Binding Title}" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10"></TextBlock>
 		<Grid ColumnDefinitions="*,Auto"  Grid.Column="1" Grid.Row="0"  Margin="10">
 			<StackPanel  Grid.Column="1" HorizontalAlignment="Right"  Orientation="Horizontal">
@@ -40,7 +35,7 @@
 			</StackPanel>
 		</Grid>
 		<StackPanel Grid.Column="1" Grid.Row="0">
-			<ItemsControl ItemsSource="{Binding	Menus}" x:Name="menu">
+			<ItemsControl ItemsSource="{Binding	Navi}" x:Name="menu">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<StackPanel Orientation="Horizontal"></StackPanel>
@@ -48,7 +43,7 @@
 				</ItemsControl.ItemsPanel>
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Button Classes="Primary" Classes.Active="{Binding Active}"  Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" HorizontalAlignment="Left" Margin="4,0" IsVisible="{Binding IsVisible}"
+						<Button Classes="Primary" Classes.Active="{Binding Active}"  Content="{Binding DisplayName}" Command="{Binding	MenuExecuteCommand}" CommandParameter="{Binding .}" HorizontalAlignment="Left" Margin="4,0" IsVisible="{Binding IsVisible}"
 								IsEnabled="{Binding Enable}">
 							<Button.Styles>
 								<Style Selector="Button.Active">
@@ -59,10 +54,10 @@
 					</DataTemplate>
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
-			<ItemsControl ItemsSource="{Binding SubMenus}" Margin="0,4">
+			<ItemsControl ItemsSource="{Binding SubNavi}" Margin="0,4">
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Button Classes="Tertiary Small" Classes.Active="{Binding Active}" Content="{Binding DisplayName}" Command="{ReflectionBinding	DataContext.MenuExecuteCommand,ElementName=page}" CommandParameter="{Binding .}" HorizontalAlignment="Left"  Margin="4,0"  IsVisible="{Binding IsVisible}" IsEnabled="{Binding Enable}">
+						<Button Classes="Tertiary Small" Classes.Active="{Binding Active}" Content="{Binding DisplayName}" Command="{Binding	MenuExecuteCommand}" CommandParameter="{Binding .}" HorizontalAlignment="Left"  Margin="4,0"  IsVisible="{Binding IsVisible}" IsEnabled="{Binding Enable}">
 							<Button.Styles>
 								<Style Selector="Button.Active">
 									<Setter Property="Theme" Value="{DynamicResource SolidButton}" />

@@ -1,5 +1,6 @@
 ﻿using ReactiveUI;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Ty.Services;
@@ -25,13 +26,20 @@ namespace Test1.Avalonia.ViewModels
 
         public async Task ShowMessage()
         {
-            var r = await _messageBoxManager.Prompt.Handle(new PromptInfo("输入"));
+            // var r = await _messageBoxManager.Prompt.Handle(new PromptInfo("输入"));
 
-            if (r.Ok && !string.IsNullOrEmpty(r.Value))
+            await _messageBoxManager.Notify.Handle(new NotifyInfo()
             {
-                _menuService.ChangeDisplayName(UrlPathSegment!, r.Value);
-                _permissionService.AddPermission("11");
-            }
+                Level = NotifyLevel.Error,
+                Message = "sdfwe",
+                Title = "fwef"
+            });
+
+            //if (r.Ok && !string.IsNullOrEmpty(r.Value))
+            //{
+            //    _menuService.ChangeDisplayName(UrlPathSegment!, r.Value);
+            //    _permissionService.AddPermission("11");
+            //}
         }
     }
 }
