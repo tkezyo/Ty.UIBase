@@ -69,21 +69,9 @@ namespace Ty
         public WindowNotificationManager? Manager { get; set; }
 
         /// <summary>
-        /// 需要在布局的OnAttachedToVisualTree中调用
+        /// 需要在MainWindow的OnOpened中调用
         /// </summary>
         /// <param name="visual"></param>
-        /// <remarks>
-        ///    private readonly IMessageBoxManager _messageBoxManager;
-        ///    
-        ///    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-        ///    {
-        ///        base.OnAttachedToVisualTree(e);
-        ///        if (_messageBoxManager is MessageBoxManager messageBoxManager)
-        ///        {
-        ///            messageBoxManager.SetNotifyManager(this);
-        ///        }
-        ///    }
-        /// </remarks>
         public void SetNotifyManager(Visual visual)
         {
             var topLevel = TopLevel.GetTopLevel(visual);

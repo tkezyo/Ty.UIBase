@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,19 +8,20 @@ using Microsoft.Extensions.Options;
 using ReactiveUI;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Ty.Services;
 using Ty.ViewModels;
 
 namespace Ty.AvaloniaBase.Views;
 
 public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
-    public MainWindow(IHostApplicationLifetime hostApplicationLifetime, IOptions<PageOptions> options)
+    public MainWindow(IHostApplicationLifetime hostApplicationLifetime, IOptions<PageOptions> options, IMessageBoxManager messageBoxManager)
     {
         InitializeComponent();
         var vm = new MainWindowViewModel() { Title = options.Value.Title ?? "" };
         DataContext = vm;
         this.hostApplicationLifetime = hostApplicationLifetime;
-
+        this._messageBoxManager = messageBoxManager;
         if (options.Value.Hight.HasValue)
         {
             Height = options.Value.Hight.Value;
@@ -45,7 +48,25 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     }
 
     private readonly IHostApplicationLifetime hostApplicationLifetime;
+    private readonly IMessageBoxManager _messageBoxManager;
 
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        if (_messageBoxManager is MessageBoxManager messageBoxManager)
+        {
+            messageBoxManager.SetNotifyManager(this);
+        }
+    }
+
+    //protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    //{
+    //    base.OnAttachedToVisualTree(e);
+    //    if (_messageBoxManager is MessageBoxManager messageBoxManager)
+    //    {
+    //        messageBoxManager.SetNotifyManager(this);
+    //    }
+    //}
 
     protected override void OnClosed(EventArgs e)
     {
