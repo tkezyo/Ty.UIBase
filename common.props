@@ -1,7 +1,7 @@
 <Project>
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
-		<Version>0.25.0</Version>
+		<Version>0.26.0</Version>
 		<NoWarn>$(NoWarn);CS1591</NoWarn>
 		<AbpProjectType>module</AbpProjectType>
 		<RepositoryType>git</RepositoryType>

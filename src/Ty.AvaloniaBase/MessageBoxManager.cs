@@ -85,7 +85,7 @@ namespace Ty
                 NotifyLevel.Info => NotificationType.Information,
                 NotifyLevel.Warning => NotificationType.Warning,
                 NotifyLevel.Error => NotificationType.Error,
-                _ => NotificationType.Information,
+                _ => NotificationType.Success,
 
             };
 
