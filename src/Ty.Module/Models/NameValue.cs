@@ -1,48 +1,47 @@
-﻿namespace Ty
+﻿namespace Ty;
+
+/// <summary>
+/// Can be used to store Name/Value (or Key/Value) pairs.
+/// </summary>
+[Serializable]
+public class NameValue : NameValue<string>
 {
-    /// <summary>
-    /// Can be used to store Name/Value (or Key/Value) pairs.
-    /// </summary>
-    [Serializable]
-    public class NameValue : NameValue<string>
+    public NameValue()
     {
-        public NameValue()
-        {
 
-        }
-
-        public NameValue(string name, string value)
-        {
-            Name = name;
-            Value = value;
-        }
     }
 
-    /// <summary>
-    /// Can be used to store Name/Value (or Key/Value) pairs.
-    /// </summary>
-    [Serializable]
-    public class NameValue<T>
+    public NameValue(string name, string value)
     {
-        /// <summary>
-        /// Name.
-        /// </summary>
-        public string Name { get; set; } = default!;
+        Name = name;
+        Value = value;
+    }
+}
 
-        /// <summary>
-        /// Value.
-        /// </summary>
-        public T Value { get; set; } = default!;
+/// <summary>
+/// Can be used to store Name/Value (or Key/Value) pairs.
+/// </summary>
+[Serializable]
+public class NameValue<T>
+{
+    /// <summary>
+    /// Name.
+    /// </summary>
+    public string Name { get; set; } = default!;
 
-        public NameValue()
-        {
+    /// <summary>
+    /// Value.
+    /// </summary>
+    public T Value { get; set; } = default!;
 
-        }
+    public NameValue()
+    {
 
-        public NameValue(string name, T value)
-        {
-            Name = name;
-            Value = value;
-        }
+    }
+
+    public NameValue(string name, T value)
+    {
+        Name = name;
+        Value = value;
     }
 }

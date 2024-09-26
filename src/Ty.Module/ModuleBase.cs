@@ -63,7 +63,7 @@ public interface IModule
         List<IModule> modules = [];
         if (!string.IsNullOrEmpty(dependsOnFolder) && Directory.Exists(dependsOnFolder))
         {
-            //读取 dlls文件夹下的所有 dll文件，然后加载
+            //读取 dll 文件夹下的所有 dll文件，然后加载
             var files = Directory.GetFiles(dependsOnFolder, "*.dll");
             foreach (var item in files)
             {
