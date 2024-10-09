@@ -21,15 +21,17 @@ public abstract class ModuleBase : IModule
     public void AddDepend<T>()
         where T : IModule, new()
     {
-        var t = IModule.AllModules.FirstOrDefault(c => c.Name == typeof(T).Name);
+        var t = ApplicationHostBuilder.AllModules.FirstOrDefault(c => c.Name == typeof(T).Name);
         if (t is null)
         {
             t = new T();
-            IModule.AllModules.Add(t);
+            ApplicationHostBuilder.AllModules.Add(t);
         }
-
-        Modules.TryAdd(typeof(T).Name, t);
-        if (!IModule.SkipVerification && !IModule.Verification(t, this))
+        if (!Modules.ContainsKey(typeof(T).Name))
+        {
+            Modules.Add(typeof(T).Name, t);
+        }
+        if (!ApplicationHostBuilder.SkipVerification && !ApplicationHostBuilder.Verification(t, this))
         {
             throw new Exception($"模块 {t.Name} 依赖于 {this.Name}，但是 {this.Name} 已经依赖于 {t.Name}，这将导致循环依赖");
         }
@@ -56,8 +58,14 @@ public interface IModule
     Task PreConfigureServices(IHostApplicationBuilder hostApplicationBuilder);
     Task PostConfigureServices(IServiceProvider serviceProvider);
 
+   
+
+}
+
+public class ApplicationHostBuilder
+{
     public static async Task<IHost?> CreateApplicationHost<T>(string[] args, string? dependsOnFolder = null, bool skipVerification = true)
-        where T : IModule, new()
+       where T : IModule, new()
     {
         SkipVerification = skipVerification;
         List<IModule> modules = [];
@@ -140,10 +148,7 @@ public interface IModule
 
         void SetModules(IModule module)
         {
-            ModuleModel moduleModel = new()
-            {
-                Module = module,
-            };
+            ModuleModel moduleModel = new(module);
             foreach (var attr in module.Modules)
             {
                 moduleModel.PreModules.Add(attr.Key);
@@ -192,10 +197,15 @@ public interface IModule
         Order(results);
         return results;
     }
-
 }
+
 public class ModuleModel
 {
     public List<string> PreModules { get; set; } = [];
-    public required IModule Module { get; set; }
+    public  IModule Module { get; set; }
+
+    public ModuleModel(IModule module)
+    {
+        Module = module;
+    }
 }

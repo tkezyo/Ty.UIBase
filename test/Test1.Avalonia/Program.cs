@@ -26,7 +26,7 @@ namespace Test1.Avalonia
 
             Log.Logger = configuration.CreateLogger();
 
-            var host = await IModule.CreateApplicationHost<Test1AvaloniaModule>(args) ?? throw new Exception();
+            var host = await ApplicationHostBuilder.CreateApplicationHost<Test1AvaloniaModule>(args) ?? throw new Exception();
 
             await host.RunAsync();
         }
