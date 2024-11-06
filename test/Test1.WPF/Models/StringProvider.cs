@@ -1,5 +1,5 @@
 ﻿using Ty;
-using Ty.Module.Configs;
+using Ty.Configs;
 
 namespace Test1.WPF.Models
 {

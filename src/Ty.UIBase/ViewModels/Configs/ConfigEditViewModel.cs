@@ -10,7 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using TextCopy;
-using Ty.Module.Configs;
+using Ty.Configs;
 using Ty.Services.Configs;
 
 namespace Ty.ViewModels.Configs;

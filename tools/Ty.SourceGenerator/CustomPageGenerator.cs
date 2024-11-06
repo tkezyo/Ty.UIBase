@@ -103,7 +103,7 @@ using System;
 using System.Threading.Tasks;
 using Ty.ViewModels.CustomPages;
 using Ty.Services.Configs;
-using Ty.Module.Configs;
+using Ty.Configs;
 
 namespace {item.Option.ContainingNamespace};
 

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Ty.Module.Configs;
+using Ty;
+using Ty.Configs;
 
 namespace Test1.WPF.Models
 {

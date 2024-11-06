@@ -22,6 +22,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Ty.Configs\Ty.Configs.csproj" />
 	  <ProjectReference Include="..\Ty.Module\Ty.Module.csproj" />
 	</ItemGroup>
 

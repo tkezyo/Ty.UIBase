@@ -1,6 +1,7 @@
 ﻿using ReactiveUI.Fody.Helpers;
 using System.Reactive.Linq;
-using Ty.Module.Configs;
+using Ty;
+using Ty.Configs;
 using Ty.Services;
 using Ty.ViewModels;
 using Ty.ViewModels.CustomPages;

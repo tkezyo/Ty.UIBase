@@ -1,4 +1,4 @@
-﻿namespace Ty.Module.Configs;
+﻿namespace Ty;
 
 
 [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]

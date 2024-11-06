@@ -6,7 +6,7 @@ using Test1.WPF.Models;
 using Test1.WPF.ViewModels;
 using Test1.WPF.Views;
 using Ty;
-using Ty.Module.Configs;
+using Ty.Configs;
 using Ty.ViewModels;
 using Ty.Views;
 
