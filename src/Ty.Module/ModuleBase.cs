@@ -58,14 +58,22 @@ public interface IModule
     Task PreConfigureServices(IHostApplicationBuilder hostApplicationBuilder);
     Task PostConfigureServices(IServiceProvider serviceProvider);
 
-   
+
 
 }
 
-public class ApplicationHostBuilder
+public static class ApplicationHostBuilder
 {
     public static async Task<IHost?> CreateApplicationHost<T>(string[] args, string? dependsOnFolder = null, bool skipVerification = true)
-       where T : IModule, new()
+        where T : IModule, new()
+    {
+        var hostBuilder = Host.CreateApplicationBuilder(args);
+        return await CreateApplicationHost<HostApplicationBuilder, IHost, T>(hostBuilder, c => c.Build(), dependsOnFolder, skipVerification);
+    }
+    public static async Task<THost?> CreateApplicationHost<THostBuilder, THost, T>(this THostBuilder hostBuilder, Func<THostBuilder, THost> build, string? dependsOnFolder = null, bool skipVerification = true)
+        where THostBuilder : IHostApplicationBuilder
+        where THost : IHost
+        where T : IModule, new()
     {
         SkipVerification = skipVerification;
         List<IModule> modules = [];
@@ -96,9 +104,6 @@ public class ApplicationHostBuilder
 
         var orderedModules = GetOrderedModules<T>(modules, skipVerification);
 
-
-        var hostBuilder = Host.CreateApplicationBuilder(args);
-
         foreach (var item in orderedModules)
         {
             await item.Module.PreConfigureServices(hostBuilder);
@@ -109,7 +114,7 @@ public class ApplicationHostBuilder
         }
 
         //build host
-        var host = hostBuilder.Build();
+        var host = build(hostBuilder);
 
         foreach (var item in orderedModules)
         {
@@ -202,7 +207,7 @@ public class ApplicationHostBuilder
 public class ModuleModel
 {
     public List<string> PreModules { get; set; } = [];
-    public  IModule Module { get; set; }
+    public IModule Module { get; set; }
 
     public ModuleModel(IModule module)
     {
