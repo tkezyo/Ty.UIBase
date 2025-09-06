@@ -4,7 +4,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ReactiveUI;
 
 namespace Ty
 {
@@ -16,30 +15,31 @@ namespace Ty
         {
             TyApp.ServiceProvider = serviceProvider;
 
-            _classicDesktopStyleApplicationLifetime = new ClassicDesktopStyleApplicationLifetime
-            {
-                ShutdownMode = ShutdownMode.OnExplicitShutdown
-            };
-            _classicDesktopStyleApplicationLifetime.Exit += (s, e) =>
-            {
-                hostApplicationLifetime.StopApplication();
-            };
-            hostApplicationLifetime.ApplicationStopping.Register(() =>
-            {
-                _classicDesktopStyleApplicationLifetime.Shutdown();
-            });
+         
             this._serviceProvider = serviceProvider;
+            this._hostApplicationLifetime = hostApplicationLifetime;
         }
 
         private readonly IServiceProvider _serviceProvider;
-        private ClassicDesktopStyleApplicationLifetime _classicDesktopStyleApplicationLifetime;
+        private readonly IHostApplicationLifetime _hostApplicationLifetime;
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
             var builder = BuildAvaloniaApp();
-            _ = builder.SetupWithLifetime(_classicDesktopStyleApplicationLifetime);
-            _classicDesktopStyleApplicationLifetime.MainWindow = _serviceProvider.GetRequiredService<TMainWindow>();
-            _classicDesktopStyleApplicationLifetime.Start([]);
+            _ = builder.StartWithClassicDesktopLifetime([],c=>
+            {
+                c.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                c.Exit += (s, e) =>
+                {
+                    _hostApplicationLifetime.StopApplication();
+                };
+                _hostApplicationLifetime.ApplicationStopping.Register(() =>
+                {
+                    c.Shutdown();
+                });
+            }
+            );
+            //_classicDesktopStyleApplicationLifetime.MainWindow = _serviceProvider.GetRequiredService<TMainWindow>();
 
             return Task.CompletedTask;
         }
