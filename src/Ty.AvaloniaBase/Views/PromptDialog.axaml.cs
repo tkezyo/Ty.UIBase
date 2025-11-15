@@ -1,6 +1,6 @@
-using Avalonia.ReactiveUI;
 using ReactiveUI;
-using System.Reactive.Disposables;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables.Fluent;
 using Ty.ViewModels;
 
 namespace Ty;

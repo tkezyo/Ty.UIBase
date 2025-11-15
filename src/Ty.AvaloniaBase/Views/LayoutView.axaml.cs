@@ -1,12 +1,8 @@
 using Avalonia;
-using Avalonia.Controls.Notifications;
-using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.ReactiveUI;
 using Avalonia.Styling;
 using ReactiveUI;
-using System.Reactive;
-using Ty.Services;
+using ReactiveUI.Avalonia;
 using Ty.ViewModels;
 
 namespace Ty.AvaloniaBase.Views;

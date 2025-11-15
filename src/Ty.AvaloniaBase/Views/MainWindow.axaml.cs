@@ -1,11 +1,9 @@
-using Avalonia;
-using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml;
-using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Ty.Services;

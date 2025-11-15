@@ -1,5 +1,8 @@
 using Avalonia;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.Hosting;
+using System;
+using Ty;
 
 namespace Test1.Avalonia
 {
@@ -13,6 +16,9 @@ namespace Test1.Avalonia
         public override void OnFrameworkInitializationCompleted()
         {
             base.OnFrameworkInitializationCompleted();
+            var host = ApplicationHostBuilder.CreateApplicationHost<Test1AvaloniaModule>([]).GetAwaiter().GetResult();
+
+            host.Run();
         }
     }
 }

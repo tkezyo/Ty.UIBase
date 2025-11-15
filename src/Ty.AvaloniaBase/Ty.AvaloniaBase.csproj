@@ -14,19 +14,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia" Version="11.3.5" />
-		<PackageReference Include="Avalonia.Desktop" Version="11.3.5" />
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.5" />
-		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.5" />
-		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.5" />
-		<PackageReference Include="Avalonia.ReactiveUI" Version="11.3.5" />
-		<PackageReference Include="Avalonia.Xaml.Interactions.DragAndDrop" Version="11.3.0.6" />
-		<PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
-		<PackageReference Include="Semi.Avalonia" Version="11.2.1.9" />
-		<PackageReference Include="Semi.Avalonia.ColorPicker" Version="11.2.1.9" />
-		<PackageReference Include="Semi.Avalonia.DataGrid" Version="11.2.1.9" />
-		<PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
-		<PackageReference Include="Avalonia.Xaml.Interactions" Version="11.3.0.6" />
+		<PackageReference Include="Avalonia" Version="11.3.8" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.3.8" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.8" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.8" />
+		<PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.8" />
+		<PackageReference Include="MessageBox.Avalonia" Version="3.3.0" />
+		<PackageReference Include="ReactiveUI.Avalonia" Version="11.3.8" />
+		<PackageReference Include="Semi.Avalonia" Version="11.3.7.1" />
+		<PackageReference Include="Semi.Avalonia.ColorPicker" Version="11.3.7.1" />
+		<PackageReference Include="Semi.Avalonia.DataGrid" Version="11.3.7.1" />
+		<PackageReference Include="Xaml.Behaviors.Interactions" Version="11.3.8.2" />
+		<PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop" Version="11.3.8.2" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -40,10 +39,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Update="Fody" Version="6.9.3">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-	  </PackageReference>
 	  <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0">
 	    <PrivateAssets>all</PrivateAssets>
 	    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

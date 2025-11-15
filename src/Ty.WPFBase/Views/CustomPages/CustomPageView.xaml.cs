@@ -1,9 +1,9 @@
-﻿using System;
-using ReactiveUI;
+﻿using ReactiveUI;
+using System;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using System.Windows.Input;
 using Ty.ViewModels.CustomPages;
-using System.Reactive.Disposables;
 
 namespace Ty.Views.CustomPages
 {

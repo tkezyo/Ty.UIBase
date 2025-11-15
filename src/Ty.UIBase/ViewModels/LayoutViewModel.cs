@@ -1,7 +1,6 @@
-﻿using DynamicData;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Reactive;

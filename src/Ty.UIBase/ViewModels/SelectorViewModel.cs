@@ -1,9 +1,9 @@
 ﻿using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
+using ReactiveUI.SourceGenerators;
 
 namespace Ty.ViewModels
 {

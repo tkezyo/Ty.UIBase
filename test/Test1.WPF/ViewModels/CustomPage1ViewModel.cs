@@ -1,9 +1,8 @@
-﻿using ReactiveUI.Fody.Helpers;
-using System.Reactive.Linq;
+﻿using System.Reactive.Linq;
 using Ty;
-using Ty.Configs;
 using Ty.Services;
 using Ty.ViewModels;
+using ReactiveUI.SourceGenerators;
 using Ty.ViewModels.CustomPages;
 
 namespace Test1.WPF.ViewModels

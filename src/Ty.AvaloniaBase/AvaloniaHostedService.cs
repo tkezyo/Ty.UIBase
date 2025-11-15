@@ -1,9 +1,9 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ReactiveUI.Avalonia;
 
 namespace Ty
 {
@@ -28,15 +28,15 @@ namespace Ty
             var builder = BuildAvaloniaApp();
             _ = builder.StartWithClassicDesktopLifetime([],c=>
             {
-                c.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-                c.Exit += (s, e) =>
-                {
-                    _hostApplicationLifetime.StopApplication();
-                };
-                _hostApplicationLifetime.ApplicationStopping.Register(() =>
-                {
-                    c.Shutdown();
-                });
+                //c.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                //c.Exit += (s, e) =>
+                //{
+                //    _hostApplicationLifetime.StopApplication();
+                //};
+                //_hostApplicationLifetime.ApplicationStopping.Register(() =>
+                //{
+                //    c.Shutdown();
+                //});
             }
             );
             //_classicDesktopStyleApplicationLifetime.MainWindow = _serviceProvider.GetRequiredService<TMainWindow>();
