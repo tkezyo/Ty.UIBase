@@ -19,7 +19,6 @@ namespace Test1.Avalonia
         {
             hostApplicationBuilder.Services.AddSingleton<App>();
             hostApplicationBuilder.Services.AddTransient<MainWindow>();
-            hostApplicationBuilder.Services.AddHostedService<AvaloniaHostedService<App, MainWindow>>();
             hostApplicationBuilder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
             //serviceDescriptors.AddTransientCustomPageView<ChatViewModel, ChatView>();

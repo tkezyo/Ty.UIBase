@@ -17,7 +17,7 @@ namespace Test1.WPF
         public override Task ConfigureServices(IHostApplicationBuilder builder)
         {
             builder.Services.AddSingleton<App>();
-            builder.Services.AddHostedService<WpfHostedService<App, MainWindow>>();
+            //builder.Services.AddHostedService<WpfHostedService<App, MainWindow>>();
             builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog(dispose: true));
 
             builder.Services.AddTransientView<ConfigTestViewModel, ConfigTestView>();
