@@ -2,7 +2,7 @@
 	<Import Project="..\..\common.props" />
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0-windows10.0.19041.0;</TargetFrameworks>
+		<TargetFrameworks>net10.0-windows10.0.19041.0;</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
 		<RootNamespace>Ty</RootNamespace>
@@ -22,7 +22,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="ReactiveUI.WPF" Version="22.2.1" />
+		<PackageReference Include="ReactiveUI.WPF" Version="22.3.1" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
 	</ItemGroup>
 
